@@ -1,0 +1,163 @@
+:root {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #f6f0df;
+  background: #090b0f;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #24262b, #090b0f 60%);
+}
+
+button { font: inherit; }
+
+main {
+  width: min(100%, 470px);
+  margin: 0 auto;
+  padding: 14px 10px 28px;
+  text-align: center;
+}
+
+.game-header {
+  margin-bottom: 10px;
+}
+
+h1 {
+  margin: 0;
+  font-family: Georgia, serif;
+  font-size: clamp(1.7rem, 7vw, 2.5rem);
+  letter-spacing: .03em;
+}
+
+h1 span {
+  opacity: .55;
+  font-size: .58em;
+  text-transform: uppercase;
+}
+
+.status {
+  margin-top: 5px;
+  min-height: 1.5em;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+/*
+  COORDENADAS DEL TABLERO DENTRO DE LA ILUSTRACIÓN (853 × 1844).
+  Las dejamos en porcentajes para que sigan cuadrando al cambiar el tamaño del móvil.
+*/
+.scene {
+  --board-left: 15.35%;
+  --board-top: 33.25%;
+  --board-width: 67.75%;
+  --board-height: 33.20%;
+
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 14px;
+  box-shadow: 0 18px 55px rgba(0, 0, 0, .55);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.scene-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.board-hitbox {
+  position: absolute;
+  left: var(--board-left);
+  top: var(--board-top);
+  width: var(--board-width);
+  height: var(--board-height);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+}
+
+.cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  padding: 8%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cell::before {
+  content: "";
+  position: absolute;
+  inset: 6%;
+  border-radius: 10%;
+  background: rgba(255, 255, 255, 0);
+  transition: background .15s ease, box-shadow .15s ease;
+}
+
+.cell:hover::before,
+.cell:focus-visible::before {
+  background: rgba(255, 255, 255, .08);
+  box-shadow: inset 0 0 18px rgba(255, 255, 255, .08);
+}
+
+.piece-image {
+  position: relative;
+  z-index: 1;
+  width: 88%;
+  height: 88%;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 6px rgba(0, 0, 0, .65));
+  pointer-events: none;
+}
+
+.piece-fallback {
+  position: relative;
+  z-index: 1;
+  display: none;
+  font-family: Georgia, serif;
+  font-size: clamp(2.4rem, 13vw, 4.7rem);
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 4px 12px #000, 0 0 18px currentColor;
+  pointer-events: none;
+}
+
+.piece-fallback.visible { display: block; }
+.piece-fallback.zeus { color: #ffd76a; }
+.piece-fallback.thor { color: #80cfff; }
+
+.reset {
+  margin-top: 16px;
+  padding: 11px 22px;
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .1);
+  color: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.reset:hover { background: rgba(255, 255, 255, .16); }
+
+.hint {
+  margin: 10px auto 0;
+  max-width: 390px;
+  font-size: .8rem;
+  opacity: .55;
+}
+
+@media (max-width: 380px) {
+  main { padding-inline: 6px; }
+  .scene { border-radius: 8px; }
+}
