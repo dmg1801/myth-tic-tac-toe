@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './style.css';
 import boardImage from './assets/boards/zeus-thor-board.png';
+import player1Image from './assets/players/player1.png';
+import player2Image from './assets/players/player2.png';
 
 type Player = 'X' | 'O';
 type Cell = Player | null;
@@ -74,9 +76,7 @@ function App() {
                 <>
                   <img
                     className="piece-image"
-                    src={value === 'X'
-                      ? '/src/assets/players/player1.png'
-                      : '/src/assets/players/player2.png'}
+                    src={value === 'X' ? player1Image : player2Image}
                     alt={value === 'X' ? 'Zeus' : 'Thor'}
                     onError={(event) => {
                       event.currentTarget.style.display = 'none';
