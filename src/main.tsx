@@ -145,6 +145,26 @@ function App() {
   const winningLine = getWinningLine(board);
   const [boardIntro, setBoardIntro] = useState(true);
 
+  const [zeusScore, setZeusScore] = useState(0);
+  const [thorScore, setThorScore] = useState(0);
+  const [drawScore, setDrawScore] = useState(0);
+
+  const resultCounted = useRef(false);
+
+useEffect(() => {
+  if (!gameOver || resultCounted.current) return;
+
+  resultCounted.current = true;
+
+  if (winner === HUMAN) {
+    setZeusScore((score: number) => score + 1);
+  } else if (winner === COMPUTER) {
+    setThorScore((score: number) => score + 1);
+  } else if (draw) {
+    setDrawScore((score: number) => score + 1);
+  }
+}, [gameOver, winner, draw]);
+
 useEffect(() => {
   const audio = new Audio(ambienceSound);
 
@@ -262,6 +282,7 @@ function toggleMusic() {
     setThinking(false);
     setShowResult(false);
     setBoardIntro(true);
+    resultCounted.current = false;
   }
 
   const status = winner
@@ -297,6 +318,17 @@ function toggleMusic() {
 
       <section className="scene" aria-label="Tablero mitológico Zeus contra Thor">
         <img className="scene-image" src={boardImage} alt="Escenario mitológico de Zeus contra Thor" />
+        <div className="score score-zeus">
+          {zeusScore}
+        </div>
+
+        <div className="score score-draw">
+          {drawScore}
+        </div>
+
+        <div className="score score-thor">
+          {thorScore}
+        </div>
 
         <div className={`board-hitbox ${thinking ? 'locked' : ''}`}>
           {board.map((value, index) => (

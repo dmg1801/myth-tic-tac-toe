@@ -374,6 +374,42 @@ h1 span {
 .cell-intro:nth-child(8) { animation-delay: 0.15s; }
 .cell-intro:nth-child(9) { animation-delay: 0.20s; }
 
+.score {
+  position: absolute;
+  z-index: 8;
+
+  transform: translate(-50%, -50%);
+
+  font-size: clamp(20px, 5vw, 36px);
+  font-weight: 800;
+
+  color: white;
+
+  text-shadow:
+    0 2px 3px rgba(0, 0, 0, 0.9),
+    0 0 8px rgba(255, 255, 255, 0.4);
+
+  pointer-events: none;
+}
+
+/* Escudo de Zeus */
+.score-zeus {
+  left: 27%;
+  top: 23%;
+}
+
+/* Columna central */
+.score-draw {
+  left: 50%;
+  top: 23%;
+}
+
+/* Escudo de Thor */
+.score-thor {
+  left: 73%;
+  top: 23%;
+}
+
 @keyframes pieceArrival {
   from { opacity: 0; transform: scale(.45) translateY(-10%); filter: drop-shadow(0 8px 8px rgba(0,0,0,.65)) brightness(1.45); }
   to { opacity: 1; transform: scale(1) translateY(0); filter: drop-shadow(0 5px 6px rgba(0,0,0,.65)) brightness(1); }
