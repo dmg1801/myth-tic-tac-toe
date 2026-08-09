@@ -143,6 +143,7 @@ function App() {
   const draw = !winner && board.every(Boolean);
   const gameOver = Boolean(winner || draw);
   const winningLine = getWinningLine(board);
+  const [boardIntro, setBoardIntro] = useState(true);
 
 useEffect(() => {
   const audio = new Audio(ambienceSound);
@@ -157,6 +158,16 @@ useEffect(() => {
     ambienceRef.current = null;
   };
 }, []);
+
+useEffect(() => {
+  if (!boardIntro) return;
+
+  const timer = window.setTimeout(() => {
+    setBoardIntro(false);
+  }, 2000);
+
+  return () => window.clearTimeout(timer);
+}, [boardIntro]);
 
   useEffect(() => {
   if (!gameOver) {
@@ -259,6 +270,7 @@ function toggleMusic() {
     setTurn(HUMAN);
     setThinking(false);
     setShowResult(false);
+    setBoardIntro(true);
   }
 
   const status = winner
@@ -298,7 +310,7 @@ function toggleMusic() {
         <div className={`board-hitbox ${thinking ? 'locked' : ''}`}>
           {board.map((value, index) => (
             <button
-              className="cell"
+              className={`cell ${boardIntro ? 'cell-intro' : ''}`}
               key={index}
               onClick={() => play(index)}
               disabled={turn !== HUMAN || thinking || gameOver || Boolean(value)}
