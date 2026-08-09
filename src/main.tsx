@@ -304,9 +304,14 @@ function toggleMusic() {
 
   return (
     <main>
-      <header className="game-header">
-        <h1>Zeus <span>vs</span> Thor</h1>
-        <div className={`status ${thinking ? 'thinking' : ''}`}>{status}</div>
+      <section className="scene" aria-label="Tablero mitológico Zeus contra Thor">
+
+        <img
+          className="scene-image"
+          src={boardImage}
+          alt="Escenario mitológico de Zeus contra Thor"
+        />
+
         <button
           className="music-button"
           onClick={toggleMusic}
@@ -314,10 +319,17 @@ function toggleMusic() {
         >
           {musicMuted ? '🔇' : '🔊'}
         </button>
-      </header>
 
-      <section className="scene" aria-label="Tablero mitológico Zeus contra Thor">
-        <img className="scene-image" src={boardImage} alt="Escenario mitológico de Zeus contra Thor" />
+        <h1 className="scene-title">
+          <span className="title-zeus">ZEUS</span>
+          <span className="title-vs">vs</span>
+          <span className="title-thor">THOR</span>
+        </h1>
+
+        <div className={`scene-status ${thinking ? 'thinking' : ''}`}>
+          {status}
+        </div>
+
         <div className="score score-zeus">
           {zeusScore}
         </div>
