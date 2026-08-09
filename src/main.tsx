@@ -286,18 +286,18 @@ function toggleMusic() {
   }
 
   const status = winner
-    ? winner === HUMAN ? 'Victoria de Zeus' : 'Victoria de Thor'
+    ? winner === HUMAN ? 'Zeus Victory' : 'Thor Victory'
     : draw
-      ? 'Empate'
+      ? 'DRAW'
       : thinking
-        ? 'Thor está pensando…'
-        : 'Tu turno';
+        ? 'Thor is thinking…'
+        : 'Your turn';
 
   const resultTitle = winner === HUMAN
-    ? 'HAS GANADO'
+    ? 'YOU WON'
     : winner === COMPUTER
-      ? 'HAS SIDO DERROTADO'
-      : 'EMPATE';
+      ? 'YOU HAVE BEEN DEFEATED'
+      : 'DRAW';
 
   const resultClass = winner === HUMAN ? 'victory' : winner === COMPUTER ? 'defeat' : 'draw';
   const resultSymbol = winner === HUMAN ? '⚡' : winner === COMPUTER ? 'ᚦ' : '⚔';
@@ -365,8 +365,8 @@ function toggleMusic() {
               <div className="result-symbol">{resultSymbol}</div>
               <div className="result-ornament">◆ ━ ◆ ━ ◆</div>
               <h2>{resultTitle}</h2>
-              <p>{winner === HUMAN ? 'Los guerreros de Zeus dominan el campo.' : winner === COMPUTER ? 'Los guerreros de Thor han roto tus filas.' : 'Ningún bando reclama la victoria.'}</p>
-              <button className="new-battle" onClick={reset}>NUEVA PARTIDA</button>
+              <p>{winner === HUMAN ? 'The warriors of Zeus dominate the field.' : winner === COMPUTER ? 'The warriors of Thor have broken your lines.' : 'Neither side claims victory.'}</p>
+              <button className="new-battle" onClick={reset}>NEW BATTLE</button>
             </div>
           </div>
         )}
