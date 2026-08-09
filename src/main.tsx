@@ -52,31 +52,52 @@ function minimax(board: Cell[], maximizing: boolean, depth = 0): number {
 }
 
 function chooseComputerMove(board: Cell[]) {
-  // Thor nunca deja pasar una victoria ni ignora una derrota inmediata.
+  // 1. Si Thor puede ganar ahora, siempre gana.
   const winningMove = immediateMove(board, COMPUTER);
   if (winningMove !== null) return winningMove;
 
+  // 2. Si Zeus puede ganar en la siguiente jugada, siempre bloquea.
   const blockingMove = immediateMove(board, HUMAN);
   if (blockingMove !== null) return blockingMove;
 
-  const scored = emptyCells(board).map(index => {
-    const next = [...board];
-    next[index] = COMPUTER;
-    return { index, score: minimax(next, false) };
-  }).sort((a, b) => b.score - a.score);
+  // 3. Calculamos todas las jugadas con Minimax.
+  const scored = emptyCells(board)
+    .map(index => {
+      const next = [...board];
+      next[index] = COMPUTER;
+
+      return {
+        index,
+        score: minimax(next, false),
+      };
+    })
+    .sort((a, b) => b.score - a.score);
 
   const bestScore = scored[0].score;
   const bestMoves = scored.filter(move => move.score === bestScore);
 
-  // La mayoría de las veces juega óptimo, pero a veces elige una alternativa
-  // razonable para que las partidas no sean siempre idénticas.
-  if (Math.random() < 0.82 || scored.length <= 2) {
-    return bestMoves[Math.floor(Math.random() * bestMoves.length)].index;
+  // 4. Dificultad actual: HÉROE
+  // Thor tiene un 30% de posibilidades de cometer
+  // un error estratégico REAL.
+  const MISTAKE_CHANCE = 0.30;
+
+  if (Math.random() < MISTAKE_CHANCE && scored.length > 1) {
+    // Excluimos las mejores jugadas.
+    // Esto garantiza que cuando se equivoca,
+    // realmente está jugando de forma subóptima.
+    const mistakes = scored.filter(move => move.score < bestScore);
+
+    if (mistakes.length > 0) {
+      return mistakes[
+        Math.floor(Math.random() * mistakes.length)
+      ].index;
+    }
   }
 
-  const alternatives = scored.filter(move => move.score >= bestScore - 2);
-  const pool = alternatives.length > 1 ? alternatives : scored;
-  return pool[Math.floor(Math.random() * pool.length)].index;
+  // 5. El resto del tiempo juega óptimamente.
+  return bestMoves[
+    Math.floor(Math.random() * bestMoves.length)
+  ].index;
 }
 
 function App() {
