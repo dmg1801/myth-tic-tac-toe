@@ -119,6 +119,7 @@ function App() {
   const [board, setBoard] = useState<Cell[]>(Array(9).fill(null));
   const [turn, setTurn] = useState<Player>(HUMAN);
   const [thinking, setThinking] = useState(false);
+  const [showResult, setShowResult] = useState(false);
 
   const ambienceRef = useRef<HTMLAudioElement | null>(null);
   const [musicStarted, setMusicStarted] = useState(false);
@@ -142,16 +143,26 @@ useEffect(() => {
   };
 }, []);
 
-
   useEffect(() => {
-  if (winner === HUMAN) {
-    playSound(victorySound, 0.55);
-  } else if (winner === COMPUTER) {
-    playSound(defeatSound, 0.55);
-  } else if (draw) {
-    playSound(drawSound, 0.65);
+  if (!gameOver) {
+    setShowResult(false);
+    return;
   }
-}, [winner, draw]);
+
+  const timer = window.setTimeout(() => {
+    setShowResult(true);
+
+    if (winner === HUMAN) {
+      playSound(victorySound, 0.75);
+    } else if (winner === COMPUTER) {
+      playSound(defeatSound, 0.75);
+    } else if (draw) {
+      playSound(drawSound, 0.65);
+    }
+  }, 900);
+
+  return () => window.clearTimeout(timer);
+}, [winner, draw, gameOver]);
 
   useEffect(() => {
     if (turn !== COMPUTER || gameOver) {
@@ -159,9 +170,8 @@ useEffect(() => {
       return;
     }
 
-
     setThinking(true);
-    const delay = 520 + Math.random() * 380;
+    const delay = 1000 + Math.random() * 400;
     const timer = window.setTimeout(() => {
       setBoard(currentBoard => {
         if (getWinner(currentBoard) || currentBoard.every(Boolean)) return currentBoard;
@@ -233,6 +243,7 @@ function toggleMusic() {
     setBoard(Array(9).fill(null));
     setTurn(HUMAN);
     setThinking(false);
+    setShowResult(false);
   }
 
   const status = winner
@@ -289,7 +300,7 @@ function toggleMusic() {
           ))}
         </div>
 
-        {gameOver && (
+        {showResult && (
           <div className="result-backdrop">
             <div className={`result-panel ${resultClass}`} role="dialog" aria-live="assertive">
               <div className="result-symbol">{resultSymbol}</div>
