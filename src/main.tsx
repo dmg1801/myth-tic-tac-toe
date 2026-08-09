@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './style.css';
 import boardImage from './assets/boards/zeus-thor-board.png';
@@ -9,6 +9,7 @@ import ulfsarkSound from './assets/sounds/ulfsark.mp3';
 import victorySound from './assets/sounds/victory.mp3';
 import defeatSound from './assets/sounds/defeat.mp3';
 import drawSound from './assets/sounds/draw.mp3';
+import ambienceSound from './assets/sounds/ambience.mp3';
 
 type Player = 'X' | 'O';
 type Cell = Player | null;
@@ -119,15 +120,34 @@ function App() {
   const [turn, setTurn] = useState<Player>(HUMAN);
   const [thinking, setThinking] = useState(false);
 
+  const ambienceRef = useRef<HTMLAudioElement | null>(null);
+  const [musicStarted, setMusicStarted] = useState(false);
+  const [musicMuted, setMusicMuted] = useState(false);
+
   const winner = getWinner(board);
   const draw = !winner && board.every(Boolean);
   const gameOver = Boolean(winner || draw);
 
+useEffect(() => {
+  const audio = new Audio(ambienceSound);
+
+  audio.loop = true;
+  audio.volume = 0.18;
+
+  ambienceRef.current = audio;
+
+  return () => {
+    audio.pause();
+    ambienceRef.current = null;
+  };
+}, []);
+
+
   useEffect(() => {
   if (winner === HUMAN) {
-    playSound(victorySound, 0.75);
+    playSound(victorySound, 0.55);
   } else if (winner === COMPUTER) {
-    playSound(defeatSound, 0.75);
+    playSound(defeatSound, 0.55);
   } else if (draw) {
     playSound(drawSound, 0.65);
   }
@@ -139,6 +159,7 @@ function App() {
       return;
     }
 
+
     setThinking(true);
     const delay = 520 + Math.random() * 380;
     const timer = window.setTimeout(() => {
@@ -148,7 +169,7 @@ function App() {
         const next = [...currentBoard];
         next[move] = COMPUTER;
 
-        playSound(ulfsarkSound, 0.6);
+        playSound(ulfsarkSound, 0.15);
 
         return next;
       });
@@ -159,14 +180,49 @@ function App() {
     return () => window.clearTimeout(timer);
   }, [turn, gameOver]);
 
+  function startAmbience() {
+  const audio = ambienceRef.current;
+
+  if (!audio || musicStarted) return;
+
+  audio.play()
+    .then(() => {
+      setMusicStarted(true);
+    })
+    .catch((error: any) => {
+      console.log('No se pudo iniciar la música:', error);
+    });
+}
+
+function toggleMusic() {
+  const audio = ambienceRef.current;
+
+  if (!audio) return;
+
+  if (!musicStarted) {
+    audio.play()
+      .then(() => {
+        setMusicStarted(true);
+        setMusicMuted(false);
+      })
+      .catch(() => {});
+    return;
+  }
+
+  audio.muted = !audio.muted;
+  setMusicMuted(audio.muted);
+}
+
   function play(index: number) {
     if (turn !== HUMAN || thinking || board[index] || gameOver) return;
+
+    startAmbience();
 
     const next = [...board];
     next[index] = HUMAN;
     setBoard(next);
 
-    playSound(hopliteSound, 0.55);
+    playSound(hopliteSound, 0.40);
 
     if (!getWinner(next) && !next.every(Boolean)) {
       setTurn(COMPUTER);
@@ -201,6 +257,13 @@ function App() {
       <header className="game-header">
         <h1>Zeus <span>vs</span> Thor</h1>
         <div className={`status ${thinking ? 'thinking' : ''}`}>{status}</div>
+        <button
+          className="music-button"
+          onClick={toggleMusic}
+          aria-label={musicMuted ? 'Activar música' : 'Silenciar música'}
+        >
+          {musicMuted ? '🔇' : '🔊'}
+        </button>
       </header>
 
       <section className="scene" aria-label="Tablero mitológico Zeus contra Thor">

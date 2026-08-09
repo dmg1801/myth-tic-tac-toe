@@ -283,6 +283,25 @@ h1 span {
   outline: 1px solid rgba(255,220,145,.65);
 }
 
+.music-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+
+  width: 42px;
+  height: 42px;
+
+  border: 1px solid rgba(255, 215, 120, 0.4);
+  border-radius: 50%;
+
+  background: rgba(10, 10, 15, 0.55);
+  backdrop-filter: blur(5px);
+
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 20;
+}
+
 @keyframes pieceArrival {
   from { opacity: 0; transform: scale(.45) translateY(-10%); filter: drop-shadow(0 8px 8px rgba(0,0,0,.65)) brightness(1.45); }
   to { opacity: 1; transform: scale(1) translateY(0); filter: drop-shadow(0 5px 6px rgba(0,0,0,.65)) brightness(1); }
