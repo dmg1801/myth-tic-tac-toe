@@ -30,6 +30,20 @@ const getWinner = (board: Cell[]) => {
   return null;
 };
 
+function getWinningLine(board: Cell[]): number[] | null {
+  for (const [a, b, c] of wins) {
+    if (
+      board[a] &&
+      board[a] === board[b] &&
+      board[a] === board[c]
+    ) {
+      return [a, b, c];
+    }
+  }
+
+  return null;
+}
+
 const emptyCells = (board: Cell[]) =>
   board.map((cell, index) => cell === null ? index : -1).filter(index => index !== -1);
 
@@ -128,6 +142,7 @@ function App() {
   const winner = getWinner(board);
   const draw = !winner && board.every(Boolean);
   const gameOver = Boolean(winner || draw);
+  const winningLine = getWinningLine(board);
 
 useEffect(() => {
   const audio = new Audio(ambienceSound);
@@ -159,7 +174,7 @@ useEffect(() => {
     } else if (draw) {
       playSound(drawSound, 0.45);
     }
-  }, 900);
+  }, 1200);
 
   return () => window.clearTimeout(timer);
 }, [winner, draw, gameOver]);
@@ -291,7 +306,16 @@ function toggleMusic() {
             >
               {value && (
                 <img
-                  className="piece-image piece-enter"
+                   className={`
+                      piece-image
+                      piece-enter
+                      ${winningLine?.includes(index)
+                        ? value === HUMAN
+                          ? 'winner-zeus'
+                          : 'winner-thor'
+                        : ''
+                      }
+                    `}
                   src={value === HUMAN ? player1Image : player2Image}
                   alt={value === HUMAN ? 'Hoplita de Zeus' : 'Ulfsark de Thor'}
                 />
