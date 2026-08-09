@@ -133,7 +133,7 @@ useEffect(() => {
   const audio = new Audio(ambienceSound);
 
   audio.loop = true;
-  audio.volume = 0.18;
+  audio.volume = 0.05;
 
   ambienceRef.current = audio;
 
@@ -153,11 +153,11 @@ useEffect(() => {
     setShowResult(true);
 
     if (winner === HUMAN) {
-      playSound(victorySound, 0.75);
+      playSound(victorySound, 0.45);
     } else if (winner === COMPUTER) {
-      playSound(defeatSound, 0.75);
+      playSound(defeatSound, 0.45);
     } else if (draw) {
-      playSound(drawSound, 0.65);
+      playSound(drawSound, 0.45);
     }
   }, 900);
 
@@ -179,7 +179,7 @@ useEffect(() => {
         const next = [...currentBoard];
         next[move] = COMPUTER;
 
-        playSound(ulfsarkSound, 0.15);
+        playSound(ulfsarkSound, 0.10);
 
         return next;
       });
@@ -232,7 +232,7 @@ function toggleMusic() {
     next[index] = HUMAN;
     setBoard(next);
 
-    playSound(hopliteSound, 0.40);
+    playSound(hopliteSound, 0.15);
 
     if (!getWinner(next) && !next.every(Boolean)) {
       setTurn(COMPUTER);
