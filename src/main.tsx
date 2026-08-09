@@ -159,16 +159,6 @@ useEffect(() => {
   };
 }, []);
 
-useEffect(() => {
-  if (!boardIntro) return;
-
-  const timer = window.setTimeout(() => {
-    setBoardIntro(false);
-  }, 2000);
-
-  return () => window.clearTimeout(timer);
-}, [boardIntro]);
-
   useEffect(() => {
   if (!gameOver) {
     setShowResult(false);
@@ -253,6 +243,7 @@ function toggleMusic() {
     if (turn !== HUMAN || thinking || board[index] || gameOver) return;
 
     startAmbience();
+    setBoardIntro(false);
 
     const next = [...board];
     next[index] = HUMAN;

@@ -359,7 +359,7 @@ h1 span {
 }
 
 .cell-intro {
-  animation: cellIntroPulse 0.8s ease-in-out 2;
+  animation: cellIntroPulse 0.8s ease-in-out infinite;
 }
 
 .cell-intro:nth-child(1) { animation-delay: 0.00s; }
