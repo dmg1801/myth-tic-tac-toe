@@ -4,6 +4,11 @@ import './style.css';
 import boardImage from './assets/boards/zeus-thor-board.png';
 import player1Image from './assets/players/player1.png';
 import player2Image from './assets/players/player2.png';
+import hopliteSound from './assets/sounds/hoplite.mp3';
+import ulfsarkSound from './assets/sounds/ulfsark.mp3';
+import victorySound from './assets/sounds/victory.mp3';
+import defeatSound from './assets/sounds/defeat.mp3';
+import drawSound from './assets/sounds/draw.mp3';
 
 type Player = 'X' | 'O';
 type Cell = Player | null;
@@ -100,6 +105,15 @@ function chooseComputerMove(board: Cell[]) {
   ].index;
 }
 
+function playSound(src: string, volume = 0.6) {
+  const audio = new Audio(src);
+  audio.volume = volume;
+
+  audio.play().catch(error => {
+    console.log('No se pudo reproducir el sonido:', error);
+  });
+}
+
 function App() {
   const [board, setBoard] = useState<Cell[]>(Array(9).fill(null));
   const [turn, setTurn] = useState<Player>(HUMAN);
@@ -108,6 +122,16 @@ function App() {
   const winner = getWinner(board);
   const draw = !winner && board.every(Boolean);
   const gameOver = Boolean(winner || draw);
+
+  useEffect(() => {
+  if (winner === HUMAN) {
+    playSound(victorySound, 0.75);
+  } else if (winner === COMPUTER) {
+    playSound(defeatSound, 0.75);
+  } else if (draw) {
+    playSound(drawSound, 0.65);
+  }
+}, [winner, draw]);
 
   useEffect(() => {
     if (turn !== COMPUTER || gameOver) {
@@ -123,6 +147,9 @@ function App() {
         const move = chooseComputerMove(currentBoard);
         const next = [...currentBoard];
         next[move] = COMPUTER;
+
+        playSound(ulfsarkSound, 0.6);
+
         return next;
       });
       setTurn(HUMAN);
@@ -138,6 +165,8 @@ function App() {
     const next = [...board];
     next[index] = HUMAN;
     setBoard(next);
+
+    playSound(hopliteSound, 0.55);
 
     if (!getWinner(next) && !next.every(Boolean)) {
       setTurn(COMPUTER);
