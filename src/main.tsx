@@ -345,7 +345,13 @@ function toggleMusic() {
         <div className={`board-hitbox ${thinking ? 'locked' : ''}`}>
           {board.map((value, index) => (
             <button
-              className={`cell ${boardIntro ? 'cell-intro' : ''}`}
+              className={`cell ${
+                boardIntro
+                  ? 'cell-intro'
+                  : value === null && !gameOver
+                    ? 'cell-empty'
+                    : ''
+              }`}
               key={index}
               onClick={() => play(index)}
               disabled={turn !== HUMAN || thinking || gameOver || Boolean(value)}
