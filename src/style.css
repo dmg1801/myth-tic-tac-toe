@@ -565,6 +565,27 @@ h1 {
 .cell-empty:nth-child(8) { animation-delay: 0.15s; }
 .cell-empty:nth-child(9) { animation-delay: 0.20s; }
 
+@keyframes newBattlePulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow:
+      0 0 5px rgba(255, 210, 120, 0.15),
+      inset 0 0 5px rgba(255, 255, 255, 0.05);
+  }
+
+  50% {
+    transform: scale(1.035);
+    box-shadow:
+      0 0 12px rgba(255, 210, 120, 0.40),
+      0 0 22px rgba(255, 180, 70, 0.15),
+      inset 0 0 8px rgba(255, 255, 255, 0.10);
+  }
+}
+
+.new-battle {
+  animation: newBattlePulse 2.2s ease-in-out infinite;
+}
+
 
 @keyframes pieceArrival {
   from { opacity: 0; transform: scale(.45) translateY(-10%); filter: drop-shadow(0 8px 8px rgba(0,0,0,.65)) brightness(1.45); }
