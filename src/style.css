@@ -586,6 +586,121 @@ h1 {
   animation: newBattlePulse 2.2s ease-in-out infinite;
 }
 
+.player-selector {
+  position: absolute;
+
+  /* AJUSTA ESTE VALOR para subir/bajar todo el selector */
+  top: 73%;
+
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 86%;
+  z-index: 20;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+
+  padding: 10px 12px;
+
+  background: rgba(7, 9, 13, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+
+  backdrop-filter: blur(5px);
+}
+
+.player-choice {
+  padding: 5px 10px;
+
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 6px;
+
+  background: rgba(5, 7, 10, 0.55);
+  color: rgba(255,255,255,0.65);
+
+  font-size: 11px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+.player-choice.selected.zeus {
+  color: #f2c35c;
+  border-color: rgba(242,195,92,0.8);
+  box-shadow: 0 0 10px rgba(242,195,92,0.25);
+}
+
+.player-choice.selected.thor {
+  color: #9ed8ff;
+  border-color: rgba(100,180,255,0.8);
+  box-shadow: 0 0 10px rgba(80,170,255,0.25);
+}
+
+.player-selector.locked {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.glory-progress {
+  position: absolute;
+
+  /* Un poquito por encima del selector */
+  top: 69%;
+
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 82%;
+  z-index: 20;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  pointer-events: none;
+}
+
+.glory-zeus,
+.glory-thor {
+  padding: 5px 9px;
+
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+
+  color: rgba(255, 255, 255, 0.88);
+
+  background: rgba(6, 8, 12, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 7px;
+
+  backdrop-filter: blur(4px);
+
+  white-space: nowrap;
+}
+
+.glory-zeus {
+  color: #f3cc72;
+
+  border-color: rgba(243, 204, 114, 0.25);
+
+  box-shadow:
+    0 0 10px rgba(243, 190, 70, 0.08);
+}
+
+.glory-thor {
+  color: #acd9ff;
+
+  border-color: rgba(120, 190, 255, 0.25);
+
+  box-shadow:
+    0 0 10px rgba(80, 160, 255, 0.08);
+}
 
 @keyframes pieceArrival {
   from { opacity: 0; transform: scale(.45) translateY(-10%); filter: drop-shadow(0 8px 8px rgba(0,0,0,.65)) brightness(1.45); }
