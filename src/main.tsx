@@ -466,16 +466,6 @@ function App() {
           {status}
         </div>
 
-       <div className="glory-progress" aria-label="Progreso de guerreros">
-        <span className="glory-zeus">
-          ⚡ {zeusTotalWins} GLORY
-        </span>
-
-        <span className="glory-thor">
-          {thorTotalWins} GLORY 🔨
-        </span>
-      </div>
-
         <div className="score score-zeus">{zeusScore}</div>
         <div className="score score-draw">{drawScore}</div>
         <div className="score score-thor">{thorScore}</div>
@@ -554,6 +544,16 @@ function App() {
             O · SECOND
           </button>
         </div>
+
+        <div className="glory-progress" aria-label="Progreso de guerreros">
+        <span className="glory-zeus">
+          ⚡ {zeusTotalWins} GLORY
+        </span>
+
+        <span className="glory-thor">
+          {thorTotalWins} GLORY 🔨
+        </span>
+      </div>
 
         {showResult && (
           <div className="result-backdrop">

@@ -590,7 +590,7 @@ h1 {
   position: absolute;
 
   /* AJUSTA ESTE VALOR para subir/bajar todo el selector */
-  top: 73%;
+  top: 70%;
 
   left: 50%;
   transform: translateX(-50%);
@@ -650,7 +650,7 @@ h1 {
   position: absolute;
 
   /* Un poquito por encima del selector */
-  top: 69%;
+  top: 75%;
 
   left: 50%;
   transform: translateX(-50%);
