@@ -8,10 +8,8 @@ import hopliteSound from './assets/sounds/hoplite.mp3';
 import ulfsarkSound from './assets/sounds/ulfsark.mp3';
 import victorySound from './assets/sounds/victory.mp3';
 import defeatSound from './assets/sounds/defeat.mp3';
-import drawThunderSound from './assets/sounds/draw-thunder.mp3';
-import drawWolfSound from './assets/sounds/draw-wolf.mp3';
+import drawSound from './assets/sounds/draw.mp3';
 import ambienceSound from './assets/sounds/ambience.mp3';
-import newBattleSound from './assets/sounds/new-battle.mp3';
 
 type Player = 'X' | 'O';
 type Cell = Player | null;
@@ -195,7 +193,7 @@ useEffect(() => {
     } else if (winner === COMPUTER) {
       playSound(defeatSound, 0.45);
     } else if (draw) {
-      playSound(drawThunderSound, 0.45);
+      playSound(drawSound, 0.45);
     }
   }, 1200);
 
@@ -288,7 +286,6 @@ function toggleMusic() {
   }
 
   function startNewBattle() {
-  playSound(newBattleSound, 0.55);
   reset();
 }
 
