@@ -196,7 +196,6 @@ useEffect(() => {
       playSound(defeatSound, 0.45);
     } else if (draw) {
       playSound(drawThunderSound, 0.45);
-      playSound(drawWolfSound, 0.45);
     }
   }, 1200);
 
