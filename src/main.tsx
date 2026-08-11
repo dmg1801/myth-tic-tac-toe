@@ -4,6 +4,16 @@ import './style.css';
 import boardImage from './assets/boards/zeus-thor-board.png';
 import player1Image from './assets/players/player1.png';
 import player2Image from './assets/players/player2.png';
+
+import athenaImage from './assets/players/athena.png';
+import minotaurImage from './assets/players/minotaur.png';
+import hadesImage from './assets/players/hades.png';
+import zeusImage from './assets/players/zeus.png';
+
+import freyaImage from './assets/players/freya.png';
+import frostGiantImage from './assets/players/frost-giant.png';
+import helaImage from './assets/players/hela.png';
+import thorImage from './assets/players/thor.png';
 import hopliteSound from './assets/sounds/hoplite.mp3';
 import ulfsarkSound from './assets/sounds/ulfsark.mp3';
 import victorySound from './assets/sounds/victory.mp3';
@@ -20,6 +30,79 @@ const THOR: Army = 'THOR';
 
 const GLORY_STORAGE_KEY = 'zeus-vs-thor-glory-v1';
 const UNLOCK_LEVELS = [1, 3, 5, 10] as const;
+
+type Warrior = {
+  id: string;
+  name: string;
+  unlockAt: number;
+  image: string;
+};
+
+const ZEUS_WARRIORS: Warrior[] = [
+  {
+    id: 'hoplite',
+    name: 'HOPLITE',
+    unlockAt: 0,
+    image: player1Image,
+  },
+  {
+    id: 'athena',
+    name: 'ATHENA',
+    unlockAt: 1,
+    image: athenaImage,
+  },
+  {
+    id: 'minotaur',
+    name: 'MINOTAUR',
+    unlockAt: 3,
+    image: minotaurImage,
+  },
+  {
+    id: 'hades',
+    name: 'HADES',
+    unlockAt: 5,
+    image: hadesImage,
+  },
+  {
+    id: 'zeus',
+    name: 'ZEUS',
+    unlockAt: 10,
+    image: zeusImage,
+  },
+];
+
+const THOR_WARRIORS: Warrior[] = [
+  {
+    id: 'ulfsark',
+    name: 'ULFSARK',
+    unlockAt: 0,
+    image: player2Image,
+  },
+  {
+    id: 'freya',
+    name: 'FREYA',
+    unlockAt: 1,
+    image: freyaImage,
+  },
+  {
+    id: 'frost-giant',
+    name: 'FROST GIANT',
+    unlockAt: 3,
+    image: frostGiantImage,
+  },
+  {
+    id: 'hela',
+    name: 'HELA',
+    unlockAt: 5,
+    image: helaImage,
+  },
+  {
+    id: 'thor',
+    name: 'THOR',
+    unlockAt: 10,
+    image: thorImage,
+  },
+];
 
 type GloryProgress = {
   zeusWins: number;
@@ -186,11 +269,23 @@ function App() {
   const [glory, setGlory] = useState<GloryProgress>(() => loadGloryProgress());
   const [unlockNotice, setUnlockNotice] = useState<UnlockNotice>(null);
 
+  const [selectedZeusWarrior, setSelectedZeusWarrior] = useState(0);
+  const [selectedThorWarrior, setSelectedThorWarrior] = useState(0);
+  const [warriorPreviewIndex, setWarriorPreviewIndex] = useState(0);
+
   const zeusTotalWins = glory.zeusWins;
   const thorTotalWins = glory.thorWins;
 
   const zeusUnlockedSlots = UNLOCK_LEVELS.filter(level => zeusTotalWins >= level).length;
   const thorUnlockedSlots = UNLOCK_LEVELS.filter(level => thorTotalWins >= level).length;
+
+  const equippedZeusWarrior =
+  ZEUS_WARRIORS[selectedZeusWarrior];
+
+  const equippedThorWarrior =
+  THOR_WARRIORS[selectedThorWarrior];
+
+  
 
   // Dos decisiones independientes:
   // 1) ejército: Zeus/Hoplita o Thor/Ulfsark
@@ -200,6 +295,13 @@ function App() {
 
   const computerArmy: Army = humanArmy === ZEUS ? THOR : ZEUS;
   const computerMark: Player = humanMark === 'X' ? 'O' : 'X';
+
+  const currentWarriors = humanArmy === ZEUS ? ZEUS_WARRIORS : THOR_WARRIORS;
+  const currentWins = humanArmy === ZEUS ? zeusTotalWins : thorTotalWins;
+  const equippedWarriorIndex = humanArmy === ZEUS ? selectedZeusWarrior : selectedThorWarrior;
+  const previewWarrior = currentWarriors[warriorPreviewIndex] ?? currentWarriors[0];
+  const previewUnlocked = currentWins >= previewWarrior.unlockAt;
+  const previewEquipped = equippedWarriorIndex === warriorPreviewIndex;
 
   const winner = getWinner(board);
   const draw = !winner && board.every(Boolean);
@@ -223,41 +325,52 @@ function App() {
 
     resultCounted.current = true;
 
-    if (winner) {
-      const winningArmy = armyForMark(winner);
+   if (winner) {
+  const winningArmy = armyForMark(winner);
 
-      if (winningArmy === ZEUS) {
-        setZeusScore(score => score + 1);
+  // El marcador normal cuenta quién ganó la batalla,
+  // sea el jugador o la computadora.
+  if (winningArmy === ZEUS) {
+    setZeusScore(score => score + 1);
+  } else {
+    setThorScore(score => score + 1);
+  }
 
-        setGlory(current => {
-          const nextWins = current.zeusWins + 1;
-          const next = { ...current, zeusWins: nextWins };
-          localStorage.setItem(GLORY_STORAGE_KEY, JSON.stringify(next));
+  // GLORY SOLO se obtiene cuando gana el jugador humano.
+  if (winner === humanMark) {
+    setGlory(current => {
+      const nextWins =
+        humanArmy === ZEUS
+          ? current.zeusWins + 1
+          : current.thorWins + 1;
 
-          const unlockIndex = UNLOCK_LEVELS.indexOf(nextWins as typeof UNLOCK_LEVELS[number]);
-          if (unlockIndex !== -1) {
-            setUnlockNotice({ army: ZEUS, wins: nextWins, slot: unlockIndex + 1 });
-          }
+      const next: GloryProgress =
+        humanArmy === ZEUS
+          ? { ...current, zeusWins: nextWins }
+          : { ...current, thorWins: nextWins };
 
-          return next;
-        });
-      } else {
-        setThorScore(score => score + 1);
+      localStorage.setItem(
+        GLORY_STORAGE_KEY,
+        JSON.stringify(next)
+      );
 
-        setGlory(current => {
-          const nextWins = current.thorWins + 1;
-          const next = { ...current, thorWins: nextWins };
-          localStorage.setItem(GLORY_STORAGE_KEY, JSON.stringify(next));
+      // ¿Esta victoria acaba de desbloquear un guerrero?
+      const unlockIndex = UNLOCK_LEVELS.indexOf(
+        nextWins as typeof UNLOCK_LEVELS[number]
+      );
 
-          const unlockIndex = UNLOCK_LEVELS.indexOf(nextWins as typeof UNLOCK_LEVELS[number]);
-          if (unlockIndex !== -1) {
-            setUnlockNotice({ army: THOR, wins: nextWins, slot: unlockIndex + 1 });
-          }
-
-          return next;
+      if (unlockIndex !== -1) {
+        setUnlockNotice({
+          army: humanArmy,
+          wins: nextWins,
+          slot: unlockIndex + 1,
         });
       }
-    } else if (draw) {
+
+      return next;
+    });
+  }
+} else if (draw) {
       setDrawScore(score => score + 1);
     }
   }, [gameOver, winner, draw, humanArmy, humanMark]);
@@ -399,6 +512,51 @@ function App() {
     reset();
   }
 
+  function previousWarrior() {
+    if (battleStarted) return;
+    setWarriorPreviewIndex(current =>
+      current <= 0 ? currentWarriors.length - 1 : current - 1
+    );
+    playSound(clickSound, 0.12);
+  }
+
+  function nextWarrior() {
+    if (battleStarted) return;
+    setWarriorPreviewIndex(current =>
+      current >= currentWarriors.length - 1 ? 0 : current + 1
+    );
+    playSound(clickSound, 0.12);
+  }
+
+  function equipPreviewWarrior() {
+    if (battleStarted || !previewUnlocked) return;
+
+    if (humanArmy === ZEUS) {
+      setSelectedZeusWarrior(warriorPreviewIndex);
+    } else {
+      setSelectedThorWarrior(warriorPreviewIndex);
+    }
+
+    playSound(clickSound, 0.18);
+  }
+
+  function resetProgress() {
+    const confirmed = window.confirm(
+      'Reset all Glory and warrior unlock progress? This cannot be undone.'
+    );
+
+    if (!confirmed) return;
+
+    const emptyProgress = { zeusWins: 0, thorWins: 0 };
+    localStorage.setItem(GLORY_STORAGE_KEY, JSON.stringify(emptyProgress));
+    setGlory(emptyProgress);
+    setSelectedZeusWarrior(0);
+    setSelectedThorWarrior(0);
+    setWarriorPreviewIndex(0);
+    setUnlockNotice(null);
+    playSound(clickSound, 0.16);
+  }
+
   function selectArmy(army: Army) {
     if (battleStarted) return;
     setHumanArmy(army);
@@ -466,50 +624,7 @@ function App() {
           {status}
         </div>
 
-        <div className="score score-zeus">{zeusScore}</div>
-        <div className="score score-draw">{drawScore}</div>
-        <div className="score score-thor">{thorScore}</div>
-
-        <div className={`board-hitbox ${thinking ? 'locked' : ''}`}>
-          {board.map((value, index) => {
-            const pieceArmy = value ? armyForMark(value) : null;
-
-            return (
-              <button
-                className={`cell ${
-                  boardIntro
-                    ? 'cell-intro'
-                    : value === null && !gameOver
-                      ? 'cell-empty'
-                      : ''
-                }`}
-                key={index}
-                onClick={() => play(index)}
-                disabled={thinking || gameOver || Boolean(value) || (battleStarted && turn !== humanMark)}
-                aria-label={`Casilla ${index + 1}`}
-              >
-                {value && pieceArmy && (
-                  <img
-                    className={`
-                      piece-image
-                      piece-enter
-                      ${winningLine?.includes(index)
-                        ? pieceArmy === ZEUS
-                          ? 'winner-zeus'
-                          : 'winner-thor'
-                        : ''
-                      }
-                    `}
-                    src={pieceArmy === ZEUS ? player1Image : player2Image}
-                    alt={pieceArmy === ZEUS ? 'Hoplita de Zeus' : 'Ulfsark de Thor'}
-                  />
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-         <div className={`player-selector ${battleStarted ? 'locked' : ''}`}>
+        <div className={`player-selector ${battleStarted ? 'locked' : ''}`}>
           <button
             className={`player-choice ${humanArmy === ZEUS ? 'selected zeus' : ''}`}
             onClick={() => selectArmy(ZEUS)}
@@ -545,15 +660,154 @@ function App() {
           </button>
         </div>
 
-        <div className="glory-progress" aria-label="Progreso de guerreros">
-        <span className="glory-zeus">
-          ⚡ {zeusTotalWins} GLORY
-        </span>
+        <div className="score score-zeus">{zeusScore}</div>
+        <div className="score score-draw">{drawScore}</div>
+        <div className="score score-thor">{thorScore}</div>
 
-        <span className="glory-thor">
-          {thorTotalWins} GLORY 🔨
-        </span>
-      </div>
+        <div className={`board-hitbox ${thinking ? 'locked' : ''}`}>
+          {board.map((value, index) => {
+            const pieceArmy = value ? armyForMark(value) : null;
+
+            return (
+              <button
+                className={`cell ${
+                  boardIntro
+                    ? 'cell-intro'
+                    : value === null && !gameOver
+                      ? 'cell-empty'
+                      : ''
+                }`}
+                key={index}
+                onClick={() => play(index)}
+                disabled={thinking || gameOver || Boolean(value) || (battleStarted && turn !== humanMark)}
+                aria-label={`Casilla ${index + 1}`}
+              >
+                {value && pieceArmy && (
+                  <img
+                    className={`
+                      piece-image
+                      piece-enter
+                      ${winningLine?.includes(index)
+                        ? pieceArmy === ZEUS
+                          ? 'winner-zeus'
+                          : 'winner-thor'
+                        : ''
+                      }
+                    `}
+                   src={
+                    pieceArmy === ZEUS
+                      ? equippedZeusWarrior.image
+                      : equippedThorWarrior.image
+                  }
+                   alt={
+                    pieceArmy === ZEUS
+                      ? equippedZeusWarrior.name
+                      : equippedThorWarrior.name
+                  }
+                  />
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className={`warrior-selector ${battleStarted ? 'locked' : ''}`}>
+          <div className="warrior-title">⚔ CHOOSE WARRIOR ⚔</div>
+
+          <div className="warrior-carousel">
+            <button
+              className="warrior-arrow"
+              onClick={previousWarrior}
+              disabled={battleStarted}
+              aria-label="Previous warrior"
+            >
+              ‹
+            </button>
+
+            <div className={`warrior-card ${previewUnlocked ? 'unlocked' : 'locked-card'}`}>
+              <div className="warrior-position">
+                {warriorPreviewIndex + 1} / {currentWarriors.length}
+              </div>
+
+              <div className="warrior-preview">
+                <img
+                  src={previewWarrior.image}
+                  alt={previewWarrior.name}
+                  className={`warrior-preview-image ${
+                    !previewUnlocked ? 'locked' : ''
+                  }`}
+                />
+
+                {!previewUnlocked && (
+                  <div className="warrior-lock-icon">🔒</div>
+                )}
+              </div>
+
+             <div className="warrior-name">
+                {previewWarrior.name}
+              </div>
+
+              {previewUnlocked ? (
+                <>
+                  <div className="warrior-requirement">
+                    {previewWarrior.unlockAt === 0
+                      ? 'STARTER WARRIOR'
+                      : `UNLOCKED · ${previewWarrior.unlockAt} GLORY`}
+                  </div>
+
+                  <button
+                    className={`equip-warrior ${previewEquipped ? 'equipped' : ''}`}
+                    onClick={equipPreviewWarrior}
+                    disabled={battleStarted || previewEquipped}
+                  >
+                    {previewEquipped ? '✓ EQUIPPED' : 'EQUIP'}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="warrior-requirement">
+                    REQUIRES {previewWarrior.unlockAt} GLORY
+                  </div>
+
+                  <div className="warrior-progress-track">
+                    <div
+                      className="warrior-progress-fill"
+                      style={{
+                        width: `${Math.min(
+                          100,
+                          (currentWins / previewWarrior.unlockAt) * 100
+                        )}%`
+                      }}
+                    />
+                  </div>
+
+                  <div className="warrior-progress-text">
+                    {currentWins} / {previewWarrior.unlockAt}
+                  </div>
+                </>
+              )}
+            </div>
+
+            <button
+              className="warrior-arrow"
+              onClick={nextWarrior}
+              disabled={battleStarted}
+              aria-label="Next warrior"
+            >
+              ›
+            </button>
+          </div>
+        </div>
+
+        <button
+          className="reset-progress-button"
+          onClick={resetProgress}
+          disabled={battleStarted}
+          title="Reset Glory and unlocks"
+          aria-label="Reset Glory and unlock progress"
+        >
+          ↺
+        </button>
 
         {showResult && (
           <div className="result-backdrop">
@@ -585,7 +839,6 @@ function App() {
           </div>
         )}
       </section>
-       
     </main>
   );
 }

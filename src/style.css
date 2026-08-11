@@ -179,7 +179,7 @@ h1 {
 .result-backdrop {
   position: absolute;
   inset: 0;
-  z-index: 10;
+  z-index: 100;
   display: grid;
   place-items: center;
   padding: 8%;
@@ -650,7 +650,7 @@ h1 {
   position: absolute;
 
   /* Un poquito por encima del selector */
-  top: 75%;
+  top: 7%;
 
   left: 50%;
   transform: translateX(-50%);
@@ -700,6 +700,287 @@ h1 {
 
   box-shadow:
     0 0 10px rgba(80, 160, 255, 0.08);
+}
+
+/* =========================================================
+   WARRIOR PROGRESSION PANEL
+   Ajusta SOLO los valores top si tu artwork necesita afinarse.
+   ========================================================= */
+
+/* Glory debajo del selector ZEUS/THOR + X/O */
+.glory-progress {
+  position: absolute;
+  top: 75%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 82%;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.glory-zeus,
+.glory-thor {
+  padding: 4px 8px;
+  border-radius: 7px;
+  background: rgba(5, 7, 10, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  backdrop-filter: blur(4px);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  white-space: nowrap;
+}
+
+.glory-zeus {
+  color: #f3cc72;
+}
+
+.glory-thor {
+  color: #acd9ff;
+}
+
+/* Selector grande, una ficha a la vez */
+.warrior-selector {
+  position: absolute;
+  top: 79%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 82%;
+  z-index: 20;
+  padding: 8px 10px 10px;
+  border-radius: 12px;
+  background: rgba(5, 7, 10, 0.70);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(5px);
+  transition: opacity 0.25s ease;
+}
+
+.warrior-selector.locked {
+  opacity: 0.38;
+  pointer-events: none;
+}
+
+.warrior-title {
+  margin-bottom: 5px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+}
+
+.warrior-carousel {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 34px;
+  gap: 7px;
+  align-items: center;
+}
+
+.warrior-arrow {
+  width: 34px;
+  height: 52px;
+  border-radius: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(12, 15, 20, 0.76);
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 27px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.warrior-arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.warrior-card {
+  position: relative;
+  min-height: 74px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background: rgba(10, 13, 18, 0.82);
+  text-align: center;
+  overflow: hidden;
+}
+
+.warrior-card.unlocked {
+  box-shadow: inset 0 0 18px rgba(255, 214, 120, 0.04);
+}
+
+.warrior-card.locked-card {
+  background: rgba(8, 10, 14, 0.84);
+}
+
+.warrior-position {
+  position: absolute;
+  top: 5px;
+  right: 7px;
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.warrior-emblem {
+  height: 20px;
+  margin-top: 1px;
+  font-size: 18px;
+  line-height: 20px;
+}
+
+.warrior-name {
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.91);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.7px;
+}
+
+.warrior-requirement {
+  margin-top: 3px;
+  color: rgba(255, 255, 255, 0.54);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.45px;
+}
+
+.equip-warrior {
+  margin-top: 5px;
+  padding: 4px 12px;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 215, 120, 0.45);
+  background: rgba(20, 17, 10, 0.72);
+  color: #f3cc72;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+}
+
+.equip-warrior.equipped {
+  border-color: rgba(255, 255, 255, 0.13);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.62);
+  cursor: default;
+}
+
+.warrior-progress-track {
+  width: 74%;
+  height: 4px;
+  margin: 6px auto 0;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.warrior-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0.72;
+}
+
+.warrior-progress-text {
+  margin-top: 3px;
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+/* Botón pequeño y deliberadamente discreto: reset del progreso persistente */
+.reset-progress-button {
+  position: absolute;
+  top: 94%;
+  right: 8%;
+  z-index: 21;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background: rgba(5, 7, 10, 0.55);
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 14px;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+
+.reset-progress-button:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.reset-progress-button:disabled {
+  opacity: 0.22;
+  cursor: default;
+}
+
+@media (max-width: 600px) {
+  .glory-progress,
+  .warrior-selector {
+    width: 84%;
+  }
+
+  .warrior-selector {
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+
+  .warrior-carousel {
+    grid-template-columns: 30px minmax(0, 1fr) 30px;
+    gap: 5px;
+  }
+
+  .warrior-arrow {
+    width: 30px;
+  }
+}
+
+.warrior-preview {
+  position: relative;
+
+  height: 100px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.warrior-preview-image {
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+
+  transition:
+    filter 0.3s ease,
+    opacity 0.3s ease;
+}
+
+/* Personaje todavía bloqueado */
+.warrior-preview-image.locked {
+  filter:
+    brightness(0.15)
+    grayscale(0.9)
+    drop-shadow(0 5px 5px rgba(0, 0, 0, 0.9));
+
+  opacity: 0.65;
+}
+
+.warrior-lock-icon {
+  position: absolute;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  z-index: 2;
+
+  font-size: 28px;
+
+  filter: drop-shadow(0 3px 5px #000);
 }
 
 @keyframes pieceArrival {
