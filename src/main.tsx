@@ -276,16 +276,8 @@ function App() {
   const zeusTotalWins = glory.zeusWins;
   const thorTotalWins = glory.thorWins;
 
-  const zeusUnlockedSlots = UNLOCK_LEVELS.filter(level => zeusTotalWins >= level).length;
-  const thorUnlockedSlots = UNLOCK_LEVELS.filter(level => thorTotalWins >= level).length;
-
-  const equippedZeusWarrior =
-  ZEUS_WARRIORS[selectedZeusWarrior];
-
-  const equippedThorWarrior =
-  THOR_WARRIORS[selectedThorWarrior];
-
-  
+  const equippedZeusWarrior = ZEUS_WARRIORS[selectedZeusWarrior];
+  const equippedThorWarrior = THOR_WARRIORS[selectedThorWarrior];
 
   // Dos decisiones independientes:
   // 1) ejército: Zeus/Hoplita o Thor/Ulfsark
@@ -517,7 +509,7 @@ function App() {
     setWarriorPreviewIndex(current =>
       current <= 0 ? currentWarriors.length - 1 : current - 1
     );
-    playSound(clickSound, 0.12);
+    playSound(soundForArmy(humanArmy), 0.12);
   }
 
   function nextWarrior() {
@@ -525,7 +517,7 @@ function App() {
     setWarriorPreviewIndex(current =>
       current >= currentWarriors.length - 1 ? 0 : current + 1
     );
-    playSound(clickSound, 0.12);
+    playSound(soundForArmy(humanArmy), 0.12);
   }
 
   function equipPreviewWarrior() {
@@ -537,7 +529,7 @@ function App() {
       setSelectedThorWarrior(warriorPreviewIndex);
     }
 
-    playSound(clickSound, 0.18);
+    playSound(soundForArmy(humanArmy), 0.18);
   }
 
   function resetProgress() {
@@ -554,7 +546,7 @@ function App() {
     setSelectedThorWarrior(0);
     setWarriorPreviewIndex(0);
     setUnlockNotice(null);
-    playSound(clickSound, 0.16);
+    playSound(soundForArmy(humanArmy), 0.16);
   }
 
   function selectArmy(army: Army) {
@@ -596,6 +588,12 @@ function App() {
       : 'draw';
 
   const resultSymbol = winnerArmy === ZEUS ? '⚡' : winnerArmy === THOR ? 'ᚦ' : '⚔';
+
+  const unlockedWarrior = unlockNotice
+  ? (unlockNotice.army === ZEUS
+      ? ZEUS_WARRIORS
+      : THOR_WARRIORS)[unlockNotice.slot]
+  : null;
 
   return (
     <main>
@@ -712,6 +710,17 @@ function App() {
         </div>
 
         <div className={`warrior-selector ${battleStarted ? 'locked' : ''}`}>
+
+           <button
+          className="reset-progress-button"
+          onClick={resetProgress}
+          disabled={battleStarted}
+          title="Reset Glory and unlocks"
+          aria-label="Reset Glory and unlock progress"
+        >
+          ↺
+        </button>
+
           <div className="warrior-title">⚔ CHOOSE WARRIOR ⚔</div>
 
           <div className="warrior-carousel">
@@ -729,19 +738,30 @@ function App() {
                 {warriorPreviewIndex + 1} / {currentWarriors.length}
               </div>
 
-              <div className="warrior-preview">
+              <button
+                className={`warrior-preview ${previewEquipped ? 'equipped' : ''} ${
+                  !previewUnlocked ? 'locked' : ''
+                }`}
+                onClick={equipPreviewWarrior}
+                disabled={battleStarted || !previewUnlocked}
+                aria-label={
+                  previewUnlocked
+                    ? `Equip ${previewWarrior.name}`
+                    : `${previewWarrior.name} locked`
+                }
+              >
                 <img
                   src={previewWarrior.image}
                   alt={previewWarrior.name}
-                  className={`warrior-preview-image ${
-                    !previewUnlocked ? 'locked' : ''
-                  }`}
+                  className={`warrior-preview-image ${!previewUnlocked ? 'locked' : ''}`}
                 />
 
-                {!previewUnlocked && (
-                  <div className="warrior-lock-icon">🔒</div>
+                {!previewUnlocked && <div className="warrior-lock-icon">🔒</div>}
+
+                {previewEquipped && (
+                  <div className="warrior-equipped-badge">✓ EQUIPPED</div>
                 )}
-              </div>
+              </button>
 
              <div className="warrior-name">
                 {previewWarrior.name}
@@ -755,13 +775,6 @@ function App() {
                       : `UNLOCKED · ${previewWarrior.unlockAt} GLORY`}
                   </div>
 
-                  <button
-                    className={`equip-warrior ${previewEquipped ? 'equipped' : ''}`}
-                    onClick={equipPreviewWarrior}
-                    disabled={battleStarted || previewEquipped}
-                  >
-                    {previewEquipped ? '✓ EQUIPPED' : 'EQUIP'}
-                  </button>
                 </>
               ) : (
                 <>
@@ -799,15 +812,7 @@ function App() {
           </div>
         </div>
 
-        <button
-          className="reset-progress-button"
-          onClick={resetProgress}
-          disabled={battleStarted}
-          title="Reset Glory and unlocks"
-          aria-label="Reset Glory and unlock progress"
-        >
-          ↺
-        </button>
+       
 
         {showResult && (
           <div className="result-backdrop">
@@ -823,16 +828,33 @@ function App() {
                     : 'Neither side claims victory.'}
               </p>
 
-              {unlockNotice && (
-                <div className={`unlock-notice ${unlockNotice.army === ZEUS ? 'zeus' : 'thor'}`}>
-                  <div className="unlock-icon">🔓</div>
-                  <strong>NEW WARRIOR UNLOCKED</strong>
-                  <span>
-                    {unlockNotice.army === ZEUS ? 'GREEK' : 'NORSE'} WARRIOR {unlockNotice.slot}
-                    {' · '}{unlockNotice.wins} WINS
-                  </span>
-                </div>
-              )}
+                  {unlockNotice && unlockedWarrior && (
+                  <div
+                    className={`unlock-notice ${
+                      unlockNotice.army === ZEUS ? 'zeus' : 'thor'
+                    }`}
+                  >
+                    <div className="unlock-icon">🔓</div>
+
+                    <strong>NEW WARRIOR UNLOCKED</strong>
+
+                    <div className="unlock-warrior-image-container">
+                      <img
+                        className="unlock-warrior-image"
+                        src={unlockedWarrior.image}
+                        alt={unlockedWarrior.name}
+                      />
+                    </div>
+
+                    <div className="unlock-warrior-name">
+                      {unlockedWarrior.name}
+                    </div>
+
+                    <span>
+                      {unlockNotice.wins} GLORY
+                    </span>
+                  </div>
+                )}
 
               <button className="new-battle" onClick={startNewBattle}>NEW BATTLE</button>
             </div>
