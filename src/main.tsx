@@ -697,29 +697,33 @@ function App() {
                 disabled={thinking || gameOver || Boolean(value) || (battleStarted && turn !== humanMark)}
                 aria-label={`Casilla ${index + 1}`}
               >
-                {value && pieceArmy && (
-                  <img
-                    className={`
-                      piece-image
-                      piece-enter
-                      ${winningLine?.includes(index)
-                        ? pieceArmy === ZEUS
-                          ? 'winner-zeus'
-                          : 'winner-thor'
-                        : ''
-                      }
-                    `}
-                   src={
-                    pieceArmy === ZEUS
-                      ? equippedZeusWarrior.image
-                      : equippedThorWarrior.image
-                  }
-                   alt={
-                    pieceArmy === ZEUS
-                      ? equippedZeusWarrior.name
-                      : equippedThorWarrior.name
-                  }
-                  />
+               {value && pieceArmy && (
+                  <>
+                    <span
+                      className={`
+                        mark-background
+                        ${pieceArmy === ZEUS ? 'mark-zeus' : 'mark-thor'}
+                      `}
+                      aria-hidden="true"
+                    >
+                      {value}
+                    </span>
+
+                    <img
+                      className={`
+                        piece-image
+                        piece-enter
+                        ${winningLine?.includes(index)
+                          ? pieceArmy === ZEUS
+                            ? 'winner-zeus'
+                            : 'winner-thor'
+                          : ''
+                        }
+                      `}
+                      src={pieceArmy === ZEUS ? player1Image : player2Image}
+                      alt={pieceArmy === ZEUS ? 'Warrior of Zeus' : 'Warrior of Thor'}
+                    />
+                  </>
                 )}
               </button>
             );
