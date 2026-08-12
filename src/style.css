@@ -250,180 +250,264 @@ main {
 .player-selector.locked { opacity: .35; pointer-events: none; }
 
 /* ===== SELECTOR DE GUERRERO ===== */
-.warrior-selector {
-  position: absolute;
-  top: 79%;
-  left: 50%;
-  z-index: 20;
-  transform: translateX(-50%);
-  width: 84%;
-  padding: 8px 10px 10px;
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: 12px;
-  background: rgba(5,7,10,.78);
-  backdrop-filter: blur(5px);
-}
-.warrior-selector.locked { opacity: .38; pointer-events: none; }
-.warrior-title {
-  margin-bottom: 6px;
-  text-align: center;
-  color: rgba(255,255,255,.78);
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: 1.2px;
-}
-.warrior-carousel {
-  display: grid;
-  grid-template-columns: 58px minmax(0,1fr) 58px;
-  gap: 8px;
-  align-items: center;
-}
-.warrior-arrow {
-  width: 58px;
-  height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 1px solid rgba(255,255,255,.20);
-  border-radius: 12px;
-  background: rgba(10,13,18,.82);
-  color: rgba(255,255,255,.92);
-  font-size: 42px;
-  font-weight: 300;
-  line-height: 1;
-  cursor: pointer;
-  transition: transform .15s ease, background .15s ease;
-}
-.warrior-arrow:not(:disabled):active { transform: scale(.92); background: rgba(255,255,255,.12); }
 
-.warrior-card {
-  position: relative;
-  padding: 6px 8px 8px;
-  border: 1px solid rgba(255,255,255,.13);
-  border-radius: 10px;
-  background: rgba(10,13,18,.82);
-  text-align: center;
-  overflow: hidden;
-}
-.warrior-card.unlocked { box-shadow: inset 0 0 18px rgba(255,214,120,.04); }
-.warrior-card.locked-card { background: rgba(8,10,14,.84); }
-.warrior-position {
+/* ===== SELECTOR COMPACTO + ENCICLOPEDIA MITOLÓGICA ===== */
+.open-warrior-selector {
   position: absolute;
-  top: 5px;
-  right: 7px;
-  z-index: 3;
-  color: rgba(255,255,255,.38);
-  font-size: 8px;
-  font-weight: 700;
+  top: 75%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 82%;
+  height: 44px;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 10px;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 10px;
+  background: rgba(5,7,10,.76);
+  color: #fff;
+  backdrop-filter: blur(5px);
+  cursor: pointer;
+}
+.open-warrior-selector:disabled {
+  opacity: .38;
   pointer-events: none;
 }
+.open-warrior-selector img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 4px rgba(0,0,0,.8));
+}
+.open-warrior-selector span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+.open-warrior-selector strong {
+  font-size: 8px;
+  color: rgba(255,255,255,.58);
+  letter-spacing: .7px;
+  white-space: nowrap;
+}
 
-/* La imagen ES el botón de equipar. */
-.warrior-preview {
-  position: relative;
-  width: 100%;
-  height: 120px;
+.warrior-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 14px;
+  background: rgba(0,0,0,.84);
+  backdrop-filter: blur(6px);
+  animation: veilIn .2s ease-out both;
+}
+.warrior-modal {
+  position: relative;
+  width: min(92%, 360px);
+  max-height: 92%;
+  overflow-y: auto;
+  padding: 16px 50px 14px;
+  border: 1px solid rgba(255,215,120,.24);
+  border-radius: 16px;
+  background: linear-gradient(180deg,rgba(25,25,28,.98),rgba(7,9,13,.99));
+  box-shadow: 0 20px 60px rgba(0,0,0,.82), inset 0 0 30px rgba(255,210,100,.035);
+  text-align: center;
+  scrollbar-width: none;
+  animation: panelRise .28s cubic-bezier(.2,.9,.25,1.1) both;
+}
+.warrior-modal::-webkit-scrollbar { display: none; }
+.warrior-modal.zeus { border-color: rgba(245,194,78,.42); }
+.warrior-modal.thor { border-color: rgba(102,177,225,.42); }
+
+.warrior-modal-close {
+  position: absolute;
+  top: 6px;
+  right: 9px;
+  z-index: 3;
+  width: 30px;
+  height: 30px;
   padding: 0;
-  border: 2px solid transparent;
-  border-radius: 10px;
+  border: 0;
+  background: transparent;
+  color: rgba(255,255,255,.68);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+.warrior-modal-faction {
+  margin-bottom: 3px;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1.4px;
+  color: rgba(255,255,255,.5);
+}
+.warrior-modal-image-button {
+  position: relative;
+  width: 150px;
+  height: 160px;
+  padding: 0;
+  border: 0;
   background: transparent;
   cursor: pointer;
-  overflow: hidden;
-  transition: transform .15s ease, border-color .2s ease, box-shadow .2s ease;
 }
-.warrior-preview:not(:disabled):active { transform: scale(.95); }
-.warrior-preview.equipped {
-  border-color: rgba(255,211,105,.75);
-  box-shadow: 0 0 12px rgba(255,196,70,.28), inset 0 0 12px rgba(255,196,70,.08);
-}
-.warrior-preview.locked { cursor: not-allowed; }
-.warrior-preview-image {
+.warrior-modal-image-button:disabled { cursor: default; }
+.warrior-modal-image {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  transition: transform .2s ease, filter .2s ease, opacity .2s ease;
+  filter: drop-shadow(0 8px 8px rgba(0,0,0,.9)) drop-shadow(0 0 10px rgba(255,210,100,.12));
 }
-.warrior-preview:not(:disabled):active .warrior-preview-image { transform: scale(.96); }
-.warrior-preview-image.locked {
-  filter: brightness(.15) grayscale(.9) drop-shadow(0 5px 5px rgba(0,0,0,.9));
-  opacity: .65;
+.warrior-modal-image.locked {
+  filter: brightness(.16) grayscale(.85) drop-shadow(0 8px 8px #000);
+  opacity: .7;
 }
-.warrior-lock-icon {
+.warrior-modal-lock {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 2;
-  transform: translate(-50%,-50%);
-  font-size: 28px;
-  filter: drop-shadow(0 3px 5px #000);
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 34px;
   pointer-events: none;
 }
-.warrior-equipped-badge {
+.warrior-modal-equipped {
   position: absolute;
+  bottom: 5px;
   left: 50%;
-  bottom: 4px;
-  z-index: 2;
   transform: translateX(-50%);
-  padding: 3px 8px;
+  padding: 4px 9px;
   border: 1px solid rgba(255,215,110,.45);
   border-radius: 999px;
-  background: rgba(5,7,10,.82);
+  background: rgba(0,0,0,.82);
   color: #f3cc72;
   font-size: 8px;
   font-weight: 900;
-  letter-spacing: .7px;
   white-space: nowrap;
   pointer-events: none;
 }
-.warrior-name {
-  margin-top: 3px;
-  color: rgba(255,255,255,.91);
-  font-size: 11px;
+.warrior-modal-arrow {
+  position: absolute;
+  top: 100px;
+  width: 42px;
+  height: 78px;
+  padding: 0;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 11px;
+  background: rgba(255,255,255,.045);
+  color: rgba(255,255,255,.9);
+  font-size: 38px;
+  line-height: 1;
+  cursor: pointer;
+}
+.warrior-modal-arrow:active { transform: scale(.94); }
+.warrior-modal-arrow.left { left: 6px; }
+.warrior-modal-arrow.right { right: 6px; }
+
+.warrior-modal h2 {
+  margin: 3px 0 0;
+  color: #f4d58a;
+  font-family: Georgia,"Times New Roman",serif;
+  font-size: 20px;
+  letter-spacing: 1.5px;
+}
+.warrior-modal-title {
+  margin-top: 2px;
+  color: rgba(255,255,255,.56);
+  font-size: 9px;
   font-weight: 900;
-  letter-spacing: .7px;
+  letter-spacing: 1.15px;
 }
-.warrior-requirement {
-  margin-top: 3px;
-  color: rgba(255,255,255,.54);
-  font-size: 8px;
-  font-weight: 700;
-  letter-spacing: .45px;
+.warrior-modal-description {
+  min-height: 48px;
+  margin: 9px 0;
+  color: rgba(255,255,255,.78);
+  font-family: Georgia,"Times New Roman",serif;
+  font-size: 11px;
+  line-height: 1.45;
 }
-.warrior-progress-track {
-  width: 74%;
+.warrior-modal-requirement {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  color: rgba(255,255,255,.64);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .6px;
+}
+.warrior-modal-progress {
+  width: 82%;
   height: 4px;
-  margin: 6px auto 0;
+  margin: 3px auto 0;
   overflow: hidden;
   border-radius: 999px;
   background: rgba(255,255,255,.09);
 }
-.warrior-progress-fill { height: 100%; border-radius: inherit; background: #d9b760; opacity: .72; }
-.warrior-progress-text { margin-top: 3px; color: rgba(255,255,255,.52); font-size: 8px; font-weight: 800; }
+.warrior-modal-progress > div {
+  height: 100%;
+  border-radius: inherit;
+  background: #d9b760;
+}
+.warrior-modal-hint {
+  color: rgba(255,215,110,.68);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+.warrior-modal-hint.equipped { color: rgba(255,255,255,.48); }
 
-.reset-progress-button {
-  position: absolute;
-  top: 7px;
-  right: 9px;
-  z-index: 5;
-  width: 24px;
-  height: 24px;
+.warrior-modal-footer {
+  margin-top: 9px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: 50%;
-  background: rgba(0,0,0,.35);
-  color: rgba(255,255,255,.42);
-  font-size: 12px;
+  justify-content: space-between;
+  gap: 8px;
+}
+.warrior-modal-counter {
+  color: rgba(255,255,255,.32);
+  font-size: 8px;
+}
+.modal-reset-progress {
+  padding: 4px 7px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 6px;
+  background: rgba(255,255,255,.025);
+  color: rgba(255,255,255,.28);
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: .5px;
   cursor: pointer;
 }
-.reset-progress-button:hover { color: rgba(255,255,255,.8); }
-.reset-progress-button:disabled { opacity: .22; cursor: default; }
+.modal-reset-progress:hover { color: rgba(255,255,255,.6); }
+
+/* Imagen del personaje recién desbloqueado en YOU WON */
+.unlock-warrior-image {
+  width: 72px;
+  height: 72px;
+  margin: 4px auto 0;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 5px rgba(0,0,0,.9)) drop-shadow(0 0 8px rgba(255,220,120,.4));
+  animation: warriorUnlockPop .55s cubic-bezier(.2,1.4,.4,1) both;
+}
+.unlock-warrior-name {
+  color: #f4d58a;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+}
+@keyframes warriorUnlockPop {
+  0% { opacity: 0; transform: scale(.25); }
+  65% { opacity: 1; transform: scale(1.13); }
+  100% { opacity: 1; transform: scale(1); }
+}
 
 /* ===== RESULTADO ===== */
 .result-backdrop {
@@ -533,66 +617,12 @@ main {
 
 /* ===== MÓVIL ===== */
 @media (max-width: 380px) {
+
+  .open-warrior-selector { width: 90%; }
+  .warrior-modal { width: 96%; padding-inline: 46px; }
+  .warrior-modal-image-button { width: 138px; height: 148px; }
   main { padding-inline: 6px; }
   .scene { border-radius: 8px; }
   .player-selector { width: 90%; gap: 6px; padding-inline: 7px; }
   .player-choice { padding-inline: 7px; font-size: 10px; }
-  .warrior-selector { width: 88%; padding-inline: 7px; }
-  .warrior-carousel { grid-template-columns: 52px minmax(0,1fr) 52px; gap: 6px; }
-  .warrior-arrow { width: 52px; height: 96px; }
-}
-
-.unlock-warrior-image-container {
-  width: 74px;
-  height: 74px;
-
-  margin: 5px auto 2px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  animation: warriorUnlockPop 0.55s cubic-bezier(.2, 1.4, .4, 1);
-}
-
-.unlock-warrior-image {
-  width: 100%;
-  height: 100%;
-
-  object-fit: contain;
-
-  filter:
-    drop-shadow(0 4px 5px rgba(0, 0, 0, 0.9))
-    drop-shadow(0 0 8px rgba(255, 220, 120, 0.45));
-}
-
-.unlock-warrior-name {
-  margin-top: 1px;
-
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 1.5px;
-
-  color: #f4d58a;
-
-  text-shadow:
-    0 1px 2px #000,
-    0 0 6px rgba(255, 210, 100, 0.35);
-}
-
-@keyframes warriorUnlockPop {
-  0% {
-    opacity: 0;
-    transform: scale(0.25);
-  }
-
-  65% {
-    opacity: 1;
-    transform: scale(1.15);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
 }

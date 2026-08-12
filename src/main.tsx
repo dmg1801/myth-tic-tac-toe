@@ -34,6 +34,8 @@ const UNLOCK_LEVELS = [1, 3, 5, 10] as const;
 type Warrior = {
   id: string;
   name: string;
+  title: string;
+  description: string;
   unlockAt: number;
   image: string;
 };
@@ -42,30 +44,40 @@ const ZEUS_WARRIORS: Warrior[] = [
   {
     id: 'hoplite',
     name: 'HOPLITE',
+    title: 'WARRIOR OF ANCIENT GREECE',
+    description: 'Hoplites were heavily armed Greek infantrymen who fought in close formation, protected by large shields and armed with spears.',
     unlockAt: 0,
     image: player1Image,
   },
   {
     id: 'athena',
     name: 'ATHENA',
+    title: 'GODDESS OF WISDOM',
+    description: 'Daughter of Zeus and patron goddess of Athens. Athena embodied wisdom, strategy and disciplined warfare.',
     unlockAt: 1,
     image: athenaImage,
   },
   {
     id: 'minotaur',
     name: 'MINOTAUR',
+    title: 'BEAST OF THE LABYRINTH',
+    description: 'A mythical creature with the body of a man and the head of a bull, confined within the Labyrinth of Crete.',
     unlockAt: 3,
     image: minotaurImage,
   },
   {
     id: 'hades',
     name: 'HADES',
+    title: 'LORD OF THE UNDERWORLD',
+    description: 'Brother of Zeus and Poseidon. After the gods divided the cosmos, Hades became ruler of the Underworld and the realm of the dead.',
     unlockAt: 5,
     image: hadesImage,
   },
   {
     id: 'zeus',
     name: 'ZEUS',
+    title: 'KING OF THE GODS',
+    description: 'Ruler of the Olympian gods and master of thunder and lightning. Zeus overthrew the Titans and ruled from Mount Olympus.',
     unlockAt: 10,
     image: zeusImage,
   },
@@ -75,30 +87,40 @@ const THOR_WARRIORS: Warrior[] = [
   {
     id: 'ulfsark',
     name: 'ULFSARK',
+    title: 'WOLF WARRIOR',
+    description: 'The úlfhéðnar appear in Old Norse tradition as warriors associated with wolves and Odin, often compared with berserkers.',
     unlockAt: 0,
     image: player2Image,
   },
   {
     id: 'freya',
-    name: 'FREYA',
+    name: 'FREYJA',
+    title: 'GODDESS OF LOVE AND WAR',
+    description: 'A powerful Norse goddess associated with love, fertility, magic and battle. Freyja receives half of those who fall in combat.',
     unlockAt: 1,
     image: freyaImage,
   },
   {
     id: 'frost-giant',
     name: 'FROST GIANT',
+    title: 'JÖTUNN OF THE NORTH',
+    description: 'The jötnar are powerful beings of Norse mythology, frequently opposed to the gods and tied to the wild forces of the cosmos.',
     unlockAt: 3,
     image: frostGiantImage,
   },
   {
     id: 'hela',
-    name: 'HELA',
+    name: 'HEL',
+    title: 'RULER OF THE DEAD',
+    description: 'Daughter of Loki and ruler of the realm also called Hel. She receives many of those who die from sickness or old age.',
     unlockAt: 5,
     image: helaImage,
   },
   {
     id: 'thor',
     name: 'THOR',
+    title: 'GOD OF THUNDER',
+    description: 'Son of Odin and one of the mightiest Norse gods. Thor protects gods and humans and wields the famous hammer Mjölnir.',
     unlockAt: 10,
     image: thorImage,
   },
@@ -272,6 +294,7 @@ function App() {
   const [selectedZeusWarrior, setSelectedZeusWarrior] = useState(0);
   const [selectedThorWarrior, setSelectedThorWarrior] = useState(0);
   const [warriorPreviewIndex, setWarriorPreviewIndex] = useState(0);
+  const [showWarriorSelector, setShowWarriorSelector] = useState(false);
 
   const zeusTotalWins = glory.zeusWins;
   const thorTotalWins = glory.thorWins;
@@ -589,12 +612,6 @@ function App() {
 
   const resultSymbol = winnerArmy === ZEUS ? '⚡' : winnerArmy === THOR ? 'ᚦ' : '⚔';
 
-  const unlockedWarrior = unlockNotice
-  ? (unlockNotice.army === ZEUS
-      ? ZEUS_WARRIORS
-      : THOR_WARRIORS)[unlockNotice.slot]
-  : null;
-
   return (
     <main>
       <section className="scene" aria-label="Tablero mitológico Zeus contra Thor">
@@ -709,41 +726,72 @@ function App() {
           })}
         </div>
 
-        <div className={`warrior-selector ${battleStarted ? 'locked' : ''}`}>
-
-           <button
-          className="reset-progress-button"
-          onClick={resetProgress}
+        <button
+          className="open-warrior-selector"
+          onClick={() => setShowWarriorSelector(true)}
           disabled={battleStarted}
-          title="Reset Glory and unlocks"
-          aria-label="Reset Glory and unlock progress"
+          aria-label={`Change warrior. Current warrior: ${
+            humanArmy === ZEUS ? equippedZeusWarrior.name : equippedThorWarrior.name
+          }`}
         >
-          ↺
+          <img
+            src={
+              humanArmy === ZEUS
+                ? equippedZeusWarrior.image
+                : equippedThorWarrior.image
+            }
+            alt=""
+          />
+          <span>
+            {humanArmy === ZEUS
+              ? equippedZeusWarrior.name
+              : equippedThorWarrior.name}
+          </span>
+          <strong>CHANGE WARRIOR ›</strong>
         </button>
 
-          <div className="warrior-title">⚔ CHOOSE WARRIOR ⚔</div>
-
-          <div className="warrior-carousel">
-            <button
-              className="warrior-arrow"
-              onClick={previousWarrior}
-              disabled={battleStarted}
-              aria-label="Previous warrior"
+        {showWarriorSelector && (
+          <div
+            className="warrior-modal-backdrop"
+            onClick={() => setShowWarriorSelector(false)}
+          >
+            <div
+              className={`warrior-modal ${humanArmy === ZEUS ? 'zeus' : 'thor'}`}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Warrior selection"
+              onClick={(event) => event.stopPropagation()}
             >
-              ‹
-            </button>
+              <button
+                className="warrior-modal-close"
+                onClick={() => setShowWarriorSelector(false)}
+                aria-label="Close warrior selector"
+              >
+                ×
+              </button>
 
-            <div className={`warrior-card ${previewUnlocked ? 'unlocked' : 'locked-card'}`}>
-              <div className="warrior-position">
-                {warriorPreviewIndex + 1} / {currentWarriors.length}
+              <div className="warrior-modal-faction">
+                {humanArmy === ZEUS ? '⚡ GREEK PANTHEON' : 'NORSE PANTHEON 🔨'}
               </div>
 
               <button
-                className={`warrior-preview ${previewEquipped ? 'equipped' : ''} ${
+                className="warrior-modal-arrow left"
+                onClick={previousWarrior}
+                aria-label="Previous warrior"
+              >
+                ‹
+              </button>
+
+              <button
+                className={`warrior-modal-image-button ${
                   !previewUnlocked ? 'locked' : ''
                 }`}
-                onClick={equipPreviewWarrior}
-                disabled={battleStarted || !previewUnlocked}
+                onClick={() => {
+                  if (!previewUnlocked) return;
+                  equipPreviewWarrior();
+                  setShowWarriorSelector(false);
+                }}
+                disabled={!previewUnlocked}
                 aria-label={
                   previewUnlocked
                     ? `Equip ${previewWarrior.name}`
@@ -751,40 +799,43 @@ function App() {
                 }
               >
                 <img
+                  className={`warrior-modal-image ${
+                    !previewUnlocked ? 'locked' : ''
+                  }`}
                   src={previewWarrior.image}
                   alt={previewWarrior.name}
-                  className={`warrior-preview-image ${!previewUnlocked ? 'locked' : ''}`}
                 />
 
-                {!previewUnlocked && <div className="warrior-lock-icon">🔒</div>}
+                {!previewUnlocked && (
+                  <div className="warrior-modal-lock">🔒</div>
+                )}
 
                 {previewEquipped && (
-                  <div className="warrior-equipped-badge">✓ EQUIPPED</div>
+                  <div className="warrior-modal-equipped">✓ EQUIPPED</div>
                 )}
               </button>
 
-             <div className="warrior-name">
-                {previewWarrior.name}
-              </div>
+              <button
+                className="warrior-modal-arrow right"
+                onClick={nextWarrior}
+                aria-label="Next warrior"
+              >
+                ›
+              </button>
 
-              {previewUnlocked ? (
-                <>
-                  <div className="warrior-requirement">
-                    {previewWarrior.unlockAt === 0
-                      ? 'STARTER WARRIOR'
-                      : `UNLOCKED · ${previewWarrior.unlockAt} GLORY`}
-                  </div>
+              <h2>{previewWarrior.name}</h2>
+              <div className="warrior-modal-title">{previewWarrior.title}</div>
 
-                </>
-              ) : (
-                <>
-                  <div className="warrior-requirement">
-                    REQUIRES {previewWarrior.unlockAt} GLORY
-                  </div>
+              <p className="warrior-modal-description">
+                {previewWarrior.description}
+              </p>
 
-                  <div className="warrior-progress-track">
+              {!previewUnlocked ? (
+                <div className="warrior-modal-requirement">
+                  <strong>🔒 REQUIRES {previewWarrior.unlockAt} WINS</strong>
+                  <span>{currentWins} / {previewWarrior.unlockAt}</span>
+                  <div className="warrior-modal-progress">
                     <div
-                      className="warrior-progress-fill"
                       style={{
                         width: `${Math.min(
                           100,
@@ -793,25 +844,29 @@ function App() {
                       }}
                     />
                   </div>
-
-                  <div className="warrior-progress-text">
-                    {currentWins} / {previewWarrior.unlockAt}
-                  </div>
-                </>
+                </div>
+              ) : previewEquipped ? (
+                <div className="warrior-modal-hint equipped">READY FOR BATTLE</div>
+              ) : (
+                <div className="warrior-modal-hint">TAP THE WARRIOR TO EQUIP</div>
               )}
+
+              <div className="warrior-modal-footer">
+                <span className="warrior-modal-counter">
+                  {warriorPreviewIndex + 1} / {currentWarriors.length}
+                </span>
+
+                <button
+                  className="modal-reset-progress"
+                  onClick={resetProgress}
+                  title="Reset Glory and unlocks"
+                >
+                  ↺ RESET PROGRESS
+                </button>
+              </div>
             </div>
-
-            <button
-              className="warrior-arrow"
-              onClick={nextWarrior}
-              disabled={battleStarted}
-              aria-label="Next warrior"
-            >
-              ›
-            </button>
           </div>
-        </div>
-
+        )}
        
 
         {showResult && (
@@ -828,33 +883,24 @@ function App() {
                     : 'Neither side claims victory.'}
               </p>
 
-                  {unlockNotice && unlockedWarrior && (
-                  <div
-                    className={`unlock-notice ${
-                      unlockNotice.army === ZEUS ? 'zeus' : 'thor'
-                    }`}
-                  >
+              {unlockNotice && (() => {
+                const unlockedWarrior =
+                  (unlockNotice.army === ZEUS ? ZEUS_WARRIORS : THOR_WARRIORS)[unlockNotice.slot];
+
+                return unlockedWarrior ? (
+                  <div className={`unlock-notice ${unlockNotice.army === ZEUS ? 'zeus' : 'thor'}`}>
                     <div className="unlock-icon">🔓</div>
-
                     <strong>NEW WARRIOR UNLOCKED</strong>
-
-                    <div className="unlock-warrior-image-container">
-                      <img
-                        className="unlock-warrior-image"
-                        src={unlockedWarrior.image}
-                        alt={unlockedWarrior.name}
-                      />
-                    </div>
-
-                    <div className="unlock-warrior-name">
-                      {unlockedWarrior.name}
-                    </div>
-
-                    <span>
-                      {unlockNotice.wins} GLORY
-                    </span>
+                    <img
+                      className="unlock-warrior-image"
+                      src={unlockedWarrior.image}
+                      alt={unlockedWarrior.name}
+                    />
+                    <div className="unlock-warrior-name">{unlockedWarrior.name}</div>
+                    <span>{unlockNotice.wins} WINS</span>
                   </div>
-                )}
+                ) : null;
+              })()}
 
               <button className="new-battle" onClick={startNewBattle}>NEW BATTLE</button>
             </div>
