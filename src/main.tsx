@@ -14,12 +14,24 @@ import freyaImage from './assets/players/freya.png';
 import frostGiantImage from './assets/players/frost-giant.png';
 import helaImage from './assets/players/hela.png';
 import thorImage from './assets/players/thor.png';
+
 import hopliteSound from './assets/sounds/hoplite.mp3';
 import ulfsarkSound from './assets/sounds/ulfsark.mp3';
 import victorySound from './assets/sounds/victory.mp3';
+import athenaSound from './assets/sounds/athena.mp3';
+import minotaurSound from './assets/sounds/minotaur.mp3';
+import hadesSound from './assets/sounds/hades.mp3';
+import zeusSound from './assets/sounds/zeus.mp3';
+import frostGiantSound from './assets/sounds/frost-giant.mp3';
+import helSound from './assets/sounds/hel.mp3';
+import thorSound from './assets/sounds/thor.mp3';
+import freyaSound from './assets/sounds/freya.mp3';
+
 import defeatSound from './assets/sounds/defeat.mp3';
 import drawSound from './assets/sounds/draw.mp3';
 import ambienceSound from './assets/sounds/ambience.mp3';
+
+import pageSound from './assets/sounds/page.mp3';
 
 type Player = 'X' | 'O';
 type Cell = Player | null;
@@ -38,6 +50,7 @@ type Warrior = {
   description: string;
   unlockAt: number;
   image: string;
+  sound: string;
 };
 
 const ZEUS_WARRIORS: Warrior[] = [
@@ -48,6 +61,7 @@ const ZEUS_WARRIORS: Warrior[] = [
     description: 'Hoplites were heavily armed Greek infantrymen who fought in close formation, protected by large shields and armed with spears.',
     unlockAt: 0,
     image: player1Image,
+    sound: hopliteSound,
   },
   {
     id: 'athena',
@@ -56,6 +70,7 @@ const ZEUS_WARRIORS: Warrior[] = [
     description: 'Daughter of Zeus and patron goddess of Athens. Athena embodied wisdom, strategy and disciplined warfare.',
     unlockAt: 1,
     image: athenaImage,
+    sound: athenaSound,
   },
   {
     id: 'minotaur',
@@ -64,6 +79,7 @@ const ZEUS_WARRIORS: Warrior[] = [
     description: 'A mythical creature with the body of a man and the head of a bull, confined within the Labyrinth of Crete.',
     unlockAt: 3,
     image: minotaurImage,
+    sound: minotaurSound,
   },
   {
     id: 'hades',
@@ -72,6 +88,7 @@ const ZEUS_WARRIORS: Warrior[] = [
     description: 'Brother of Zeus and Poseidon. After the gods divided the cosmos, Hades became ruler of the Underworld and the realm of the dead.',
     unlockAt: 5,
     image: hadesImage,
+    sound: hadesSound,
   },
   {
     id: 'zeus',
@@ -80,6 +97,7 @@ const ZEUS_WARRIORS: Warrior[] = [
     description: 'Ruler of the Olympian gods and master of thunder and lightning. Zeus overthrew the Titans and ruled from Mount Olympus.',
     unlockAt: 10,
     image: zeusImage,
+    sound: zeusSound,
   },
 ];
 
@@ -91,6 +109,7 @@ const THOR_WARRIORS: Warrior[] = [
     description: 'The úlfhéðnar appear in Old Norse tradition as warriors associated with wolves and Odin, often compared with berserkers.',
     unlockAt: 0,
     image: player2Image,
+    sound: ulfsarkSound,
   },
   {
     id: 'freya',
@@ -99,6 +118,7 @@ const THOR_WARRIORS: Warrior[] = [
     description: 'A powerful Norse goddess associated with love, fertility, magic and battle. Freyja receives half of those who fall in combat.',
     unlockAt: 1,
     image: freyaImage,
+    sound: freyaSound,
   },
   {
     id: 'frost-giant',
@@ -107,6 +127,7 @@ const THOR_WARRIORS: Warrior[] = [
     description: 'The jötnar are powerful beings of Norse mythology, frequently opposed to the gods and tied to the wild forces of the cosmos.',
     unlockAt: 3,
     image: frostGiantImage,
+    sound: frostGiantSound,
   },
   {
     id: 'hela',
@@ -115,6 +136,7 @@ const THOR_WARRIORS: Warrior[] = [
     description: 'Daughter of Loki and ruler of the realm also called Hel. She receives many of those who die from sickness or old age.',
     unlockAt: 5,
     image: helaImage,
+    sound: helSound,
   },
   {
     id: 'thor',
@@ -123,6 +145,7 @@ const THOR_WARRIORS: Warrior[] = [
     description: 'Son of Odin and one of the mightiest Norse gods. Thor protects gods and humans and wields the famous hammer Mjölnir.',
     unlockAt: 10,
     image: thorImage,
+    sound: thorSound,
   },
 ];
 
@@ -327,12 +350,14 @@ function App() {
     return mark === humanMark ? humanArmy : computerArmy;
   }
 
-  function soundForArmy(army: Army) {
-    return army === ZEUS ? hopliteSound : ulfsarkSound;
-  }
+ function soundForArmy(army: Army) {
+  return army === ZEUS
+    ? equippedZeusWarrior.sound
+    : equippedThorWarrior.sound;
+}
 
   function volumeForArmy(army: Army) {
-    return army === ZEUS ? 0.15 : 0.10;
+   return 0.18;
   }
 
   useEffect(() => {
@@ -527,21 +552,45 @@ function App() {
     reset();
   }
 
-  function previousWarrior() {
-    if (battleStarted) return;
-    setWarriorPreviewIndex(current =>
-      current <= 0 ? currentWarriors.length - 1 : current - 1
-    );
-    playSound(soundForArmy(humanArmy), 0.12);
-  }
+ function previousWarrior() {
+  if (battleStarted) return;
 
-  function nextWarrior() {
-    if (battleStarted) return;
-    setWarriorPreviewIndex(current =>
-      current >= currentWarriors.length - 1 ? 0 : current + 1
-    );
-    playSound(soundForArmy(humanArmy), 0.12);
+  const newIndex =
+    warriorPreviewIndex <= 0
+      ? currentWarriors.length - 1
+      : warriorPreviewIndex - 1;
+
+  setWarriorPreviewIndex(newIndex);
+
+  const warrior = currentWarriors[newIndex];
+  const unlocked = currentWins >= warrior.unlockAt;
+
+  if (unlocked) {
+    playSound(warrior.sound, 0.18);
+  } else {
+    playSound(pageSound, 0.15);
   }
+}
+
+function nextWarrior() {
+  if (battleStarted) return;
+
+  const newIndex =
+    warriorPreviewIndex >= currentWarriors.length - 1
+      ? 0
+      : warriorPreviewIndex + 1;
+
+  setWarriorPreviewIndex(newIndex);
+
+  const warrior = currentWarriors[newIndex];
+  const unlocked = currentWins >= warrior.unlockAt;
+
+  if (unlocked) {
+    playSound(warrior.sound, 0.18);
+  } else {
+    playSound(pageSound, 0.15);
+  }
+}
 
   function equipPreviewWarrior() {
     if (battleStarted || !previewUnlocked) return;
