@@ -720,8 +720,16 @@ function App() {
                           : ''
                         }
                       `}
-                      src={pieceArmy === ZEUS ? player1Image : player2Image}
-                      alt={pieceArmy === ZEUS ? 'Warrior of Zeus' : 'Warrior of Thor'}
+                     src={
+                        pieceArmy === ZEUS
+                          ? equippedZeusWarrior.image
+                          : equippedThorWarrior.image
+                      }
+                      alt={
+                        pieceArmy === ZEUS
+                          ? equippedZeusWarrior.name
+                          : equippedThorWarrior.name
+                      }
                     />
                   </>
                 )}
