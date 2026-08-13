@@ -318,6 +318,7 @@ function App() {
   const [selectedThorWarrior, setSelectedThorWarrior] = useState(0);
   const [warriorPreviewIndex, setWarriorPreviewIndex] = useState(0);
   const [showWarriorSelector, setShowWarriorSelector] = useState(false);
+  const [selectorArmy, setSelectorArmy] = useState<Army>(ZEUS);
 
   const zeusTotalWins = glory.zeusWins;
   const thorTotalWins = glory.thorWins;
@@ -334,9 +335,9 @@ function App() {
   const computerArmy: Army = humanArmy === ZEUS ? THOR : ZEUS;
   const computerMark: Player = humanMark === 'X' ? 'O' : 'X';
 
-  const currentWarriors = humanArmy === ZEUS ? ZEUS_WARRIORS : THOR_WARRIORS;
-  const currentWins = humanArmy === ZEUS ? zeusTotalWins : thorTotalWins;
-  const equippedWarriorIndex = humanArmy === ZEUS ? selectedZeusWarrior : selectedThorWarrior;
+  const currentWarriors = selectorArmy === ZEUS ? ZEUS_WARRIORS : THOR_WARRIORS;
+  const currentWins = selectorArmy === ZEUS ? zeusTotalWins : thorTotalWins;
+  const equippedWarriorIndex = selectorArmy === ZEUS ? selectedZeusWarrior : selectedThorWarrior;
   const previewWarrior = currentWarriors[warriorPreviewIndex] ?? currentWarriors[0];
   const previewUnlocked = currentWins >= previewWarrior.unlockAt;
   const previewEquipped = equippedWarriorIndex === warriorPreviewIndex;
@@ -595,13 +596,20 @@ function nextWarrior() {
   function equipPreviewWarrior() {
     if (battleStarted || !previewUnlocked) return;
 
-    if (humanArmy === ZEUS) {
+    if (selectorArmy === ZEUS) {
       setSelectedZeusWarrior(warriorPreviewIndex);
     } else {
       setSelectedThorWarrior(warriorPreviewIndex);
     }
 
-    playSound(soundForArmy(humanArmy), 0.18);
+    playSound(previewWarrior.sound, 0.18);
+  }
+
+  function openWarriorSelector(army: Army) {
+    if (battleStarted) return;
+    setSelectorArmy(army);
+    setWarriorPreviewIndex(army === ZEUS ? selectedZeusWarrior : selectedThorWarrior);
+    setShowWarriorSelector(true);
   }
 
   function resetProgress() {
@@ -694,7 +702,7 @@ function nextWarrior() {
             onClick={() => selectArmy(ZEUS)}
             disabled={battleStarted}
           >
-            ⚡ ZEUS
+            ⚡ GREEKS
           </button>
 
           <button
@@ -702,7 +710,7 @@ function nextWarrior() {
             onClick={() => selectArmy(THOR)}
             disabled={battleStarted}
           >
-            THOR 🔨
+            NORSE 🔨
           </button>
 
           <button
@@ -721,6 +729,38 @@ function nextWarrior() {
             aria-label="Jugar segundo como O"
           >
             O · SECOND
+          </button>
+        </div>
+
+        <div className={`battle-warriors ${battleStarted ? 'locked' : ''}`}>
+          <button
+            className={`battle-warrior-card zeus ${humanArmy === ZEUS ? 'human' : 'enemy'}`}
+            onClick={() => openWarriorSelector(ZEUS)}
+            disabled={battleStarted}
+            aria-label={`Change Greek warrior. Current warrior: ${equippedZeusWarrior.name}`}
+          >
+            <span className="battle-warrior-role">
+              {humanArmy === ZEUS ? 'YOUR WARRIOR' : 'ENEMY WARRIOR'}
+            </span>
+            <img src={equippedZeusWarrior.image} alt="" />
+            <span className="battle-warrior-name">{equippedZeusWarrior.name}</span>
+            <strong>CHANGE ›</strong>
+          </button>
+
+          <div className="battle-warriors-vs">VS</div>
+
+          <button
+            className={`battle-warrior-card thor ${humanArmy === THOR ? 'human' : 'enemy'}`}
+            onClick={() => openWarriorSelector(THOR)}
+            disabled={battleStarted}
+            aria-label={`Change Norse warrior. Current warrior: ${equippedThorWarrior.name}`}
+          >
+            <span className="battle-warrior-role">
+              {humanArmy === THOR ? 'YOUR WARRIOR' : 'ENEMY WARRIOR'}
+            </span>
+            <img src={equippedThorWarrior.image} alt="" />
+            <span className="battle-warrior-name">{equippedThorWarrior.name}</span>
+            <strong>CHANGE ›</strong>
           </button>
         </div>
 
@@ -746,7 +786,7 @@ function nextWarrior() {
                 disabled={thinking || gameOver || Boolean(value) || (battleStarted && turn !== humanMark)}
                 aria-label={`Casilla ${index + 1}`}
               >
-               {value && pieceArmy && (
+                {value && pieceArmy && (
                   <>
                     <span
                       className={`
@@ -769,7 +809,7 @@ function nextWarrior() {
                           : ''
                         }
                       `}
-                     src={
+                      src={
                         pieceArmy === ZEUS
                           ? equippedZeusWarrior.image
                           : equippedThorWarrior.image
@@ -787,37 +827,13 @@ function nextWarrior() {
           })}
         </div>
 
-        <button
-          className="open-warrior-selector"
-          onClick={() => setShowWarriorSelector(true)}
-          disabled={battleStarted}
-          aria-label={`Change warrior. Current warrior: ${
-            humanArmy === ZEUS ? equippedZeusWarrior.name : equippedThorWarrior.name
-          }`}
-        >
-          <img
-            src={
-              humanArmy === ZEUS
-                ? equippedZeusWarrior.image
-                : equippedThorWarrior.image
-            }
-            alt=""
-          />
-          <span>
-            {humanArmy === ZEUS
-              ? equippedZeusWarrior.name
-              : equippedThorWarrior.name}
-          </span>
-          <strong>CHANGE WARRIOR ›</strong>
-        </button>
-
         {showWarriorSelector && (
           <div
             className="warrior-modal-backdrop"
             onClick={() => setShowWarriorSelector(false)}
           >
             <div
-              className={`warrior-modal ${humanArmy === ZEUS ? 'zeus' : 'thor'}`}
+              className={`warrior-modal ${selectorArmy === ZEUS ? 'zeus' : 'thor'}`}
               role="dialog"
               aria-modal="true"
               aria-label="Warrior selection"
@@ -832,7 +848,7 @@ function nextWarrior() {
               </button>
 
               <div className="warrior-modal-faction">
-                {humanArmy === ZEUS ? '⚡ GREEK PANTHEON' : 'NORSE PANTHEON 🔨'}
+                {selectorArmy === ZEUS ? '⚡ GREEK PANTHEON' : 'NORSE PANTHEON 🔨'}
               </div>
 
               <button
