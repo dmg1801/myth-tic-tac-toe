@@ -572,6 +572,48 @@ main {
   color: rgba(255,255,255,.32);
   font-size: 8px;
 }
+
+.warrior-modal-new {
+  position: absolute;
+  top: 7px;
+  right: 3px;
+  z-index: 5;
+
+  padding: 4px 7px;
+
+  border: 1px solid rgba(255, 220, 120, 0.75);
+  border-radius: 999px;
+
+  background: rgba(82, 52, 8, 0.94);
+  color: #ffe29a;
+
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 1px;
+
+  box-shadow:
+    0 0 12px rgba(255, 196, 70, 0.38);
+
+  text-shadow:
+    0 0 5px rgba(255, 196, 70, 0.45);
+
+  pointer-events: none;
+
+  animation: newWarriorPulse 1.25s ease-in-out infinite alternate;
+}
+
+@keyframes newWarriorPulse {
+  from {
+    transform: scale(0.96);
+    opacity: 0.72;
+  }
+
+  to {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
 .modal-reset-progress {
   padding: 4px 7px;
   border: 1px solid rgba(255,255,255,.08);
