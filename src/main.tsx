@@ -36,6 +36,7 @@ import pageSound from './assets/sounds/page.mp3';
 type Player = 'X' | 'O';
 type Cell = Player | null;
 type Army = 'ZEUS' | 'THOR';
+type Difficulty = 'EASY' | 'MEDIUM' | 'HARD';
 
 const ZEUS: Army = 'ZEUS';
 const THOR: Army = 'THOR';
@@ -243,17 +244,21 @@ function minimax(
 function chooseComputerMove(
   board: Cell[],
   computerPlayer: Player,
-  humanPlayer: Player
+  humanPlayer: Player,
+  difficulty: Difficulty
 ) {
   const winningMove = immediateMove(board, computerPlayer);
   if (winningMove !== null) return winningMove;
 
   const blockingMove = immediateMove(board, humanPlayer);
 
-  // Thor/Zeus no bloquea siempre. A veces ve la amenaza y a veces se equivoca,
-  // para que el jugador tenga oportunidades reales de cerrar una línea.
-  const BLOCK_CHANCE = 0.72;
-  if (blockingMove !== null && Math.random() < BLOCK_CHANCE) {
+  const settings = {
+    EASY: { blockChance: 0.35, mistakeChance: 0.82 },
+    MEDIUM: { blockChance: 0.72, mistakeChance: 0.55 },
+    HARD: { blockChance: 1, mistakeChance: 0 },
+  }[difficulty];
+
+  if (blockingMove !== null && Math.random() < settings.blockChance) {
     return blockingMove;
   }
 
@@ -270,13 +275,10 @@ function chooseComputerMove(
 
   const bestScore = scored[0].score;
   const bestMoves = scored.filter(move => move.score === bestScore);
-  const MISTAKE_CHANCE = 0.55;
 
-  if (Math.random() < MISTAKE_CHANCE && scored.length > 1) {
+  if (Math.random() < settings.mistakeChance && scored.length > 1) {
     let mistakes = scored.filter(move => move.score < bestScore);
 
-    // Si había una amenaza inmediata y la IA decidió no verla,
-    // excluimos esa casilla de su pool de errores.
     if (blockingMove !== null) {
       mistakes = mistakes.filter(move => move.index !== blockingMove);
     }
@@ -305,6 +307,8 @@ function App() {
   const [showResult, setShowResult] = useState(false);
   const [boardIntro, setBoardIntro] = useState(true);
   const [battleStarted, setBattleStarted] = useState(false);
+  const [difficulty, setDifficulty] = useState<Difficulty>('MEDIUM');
+  const [showDifficulty, setShowDifficulty] = useState(false);
 
   const ambienceRef = useRef<HTMLAudioElement | null>(null);
   const [musicStarted, setMusicStarted] = useState(false);
@@ -495,7 +499,7 @@ function App() {
       setBoard(currentBoard => {
         if (getWinner(currentBoard) || currentBoard.every(Boolean)) return currentBoard;
 
-        const move = chooseComputerMove(currentBoard, computerMark, humanMark);
+        const move = chooseComputerMove(currentBoard, computerMark, humanMark, difficulty);
         const next = [...currentBoard];
         next[move] = computerMark;
 
@@ -508,7 +512,7 @@ function App() {
     }, delay);
 
     return () => window.clearTimeout(timer);
-  }, [battleStarted, turn, gameOver, computerMark, humanMark, computerArmy]);
+  }, [battleStarted, turn, gameOver, computerMark, humanMark, computerArmy, difficulty]);
 
   function startAmbience() {
     const audio = ambienceRef.current;
@@ -705,6 +709,13 @@ function nextWarrior() {
     playSound(soundForArmy(humanArmy), 0.22);
   }
 
+  function selectDifficulty(level: Difficulty) {
+    if (battleStarted) return;
+    setDifficulty(level);
+    setShowDifficulty(false);
+    playSound(pageSound, 0.12);
+  }
+
   const winnerArmy = winner ? armyForMark(winner) : null;
 
   const status = winnerArmy
@@ -746,6 +757,17 @@ function nextWarrior() {
           aria-label={musicMuted ? 'Activar música' : 'Silenciar música'}
         >
           {musicMuted ? '🔇' : '🔊'}
+        </button>
+
+        <button
+          type="button"
+          className={`difficulty-button ${battleStarted ? 'locked' : ''}`}
+          onClick={() => setShowDifficulty(true)}
+          disabled={battleStarted}
+          aria-label={`Difficulty: ${difficulty}`}
+        >
+          <span>DIFFICULTY</span>
+          <strong>{difficulty}</strong>
         </button>
 
         <h1 className="scene-title">
@@ -805,9 +827,6 @@ function nextWarrior() {
               {humanArmy === ZEUS ? 'YOUR WARRIOR' : 'ENEMY WARRIOR'}
             </span>
             <img src={equippedZeusWarrior.image} alt="" />
-            {newZeusWarriors.length > 0 && (
-              <span className="battle-warrior-new">NEW!</span>
-            )}
             <span className="battle-warrior-name">{equippedZeusWarrior.name}</span>
             <strong>
               CHANGE ›
@@ -829,9 +848,6 @@ function nextWarrior() {
               {humanArmy === THOR ? 'YOUR WARRIOR' : 'ENEMY WARRIOR'}
             </span>
             <img src={equippedThorWarrior.image} alt="" />
-            {newThorWarriors.length > 0 && (
-              <span className="battle-warrior-new">NEW!</span>
-            )}
             <span className="battle-warrior-name">{equippedThorWarrior.name}</span>
             <strong>
               CHANGE ›
@@ -904,6 +920,53 @@ function nextWarrior() {
             );
           })}
         </div>
+
+        {showDifficulty && (
+          <div
+            className="difficulty-backdrop"
+            onClick={() => setShowDifficulty(false)}
+          >
+            <div
+              className="difficulty-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Choose difficulty"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <button
+                type="button"
+                className="difficulty-close"
+                onClick={() => setShowDifficulty(false)}
+                aria-label="Close difficulty selector"
+              >
+                ×
+              </button>
+
+              <div className="difficulty-kicker">CHOOSE YOUR CHALLENGE</div>
+              <h2>DIFFICULTY</h2>
+
+              <div className="difficulty-options">
+                {(['EASY', 'MEDIUM', 'HARD'] as Difficulty[]).map(level => (
+                  <button
+                    type="button"
+                    key={level}
+                    className={`difficulty-option ${difficulty === level ? 'selected' : ''}`}
+                    onClick={() => selectDifficulty(level)}
+                  >
+                    <strong>{level}</strong>
+                    <span>
+                      {level === 'EASY'
+                        ? 'Forgiving opponent'
+                        : level === 'MEDIUM'
+                          ? 'Balanced battle'
+                          : 'Perfect strategy'}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {showWarriorSelector && (
           <div
