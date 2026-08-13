@@ -42,6 +42,7 @@ const ZEUS: Army = 'ZEUS';
 const THOR: Army = 'THOR';
 
 const GLORY_STORAGE_KEY = 'zeus-vs-thor-glory-v1';
+const GOD_MODE_CODE = 'OLYMPUS';
 const UNLOCK_LEVELS = [1, 3, 5, 10] as const;
 
 type Warrior = {
@@ -337,8 +338,14 @@ function App() {
   const [showWarriorSelector, setShowWarriorSelector] = useState(false);
   const [selectorArmy, setSelectorArmy] = useState<Army>(ZEUS);
 
-  const zeusTotalWins = glory.zeusWins;
-  const thorTotalWins = glory.thorWins;
+  // Demo-only developer access. Never modifies the player's saved GLORY.
+  const [godMode, setGodMode] = useState(false);
+  const [showGodModeLogin, setShowGodModeLogin] = useState(false);
+  const [godModeCode, setGodModeCode] = useState('');
+  const [godModeError, setGodModeError] = useState(false);
+
+  const zeusTotalWins = godMode ? 10 : glory.zeusWins;
+  const thorTotalWins = godMode ? 10 : glory.thorWins;
 
   const equippedZeusWarrior = ZEUS_WARRIORS[selectedZeusWarrior];
   const equippedThorWarrior = THOR_WARRIORS[selectedThorWarrior];
@@ -716,6 +723,32 @@ function nextWarrior() {
     playSound(pageSound, 0.12);
   }
 
+  function openGodModeLogin() {
+    if (godMode) {
+      setGodMode(false);
+      playSound(pageSound, 0.18);
+      return;
+    }
+
+    setGodModeCode('');
+    setGodModeError(false);
+    setShowGodModeLogin(true);
+  }
+
+  function activateGodMode() {
+    if (godModeCode.trim().toUpperCase() !== GOD_MODE_CODE) {
+      setGodModeError(true);
+      playSound(pageSound, 0.12);
+      return;
+    }
+
+    setGodMode(true);
+    setShowGodModeLogin(false);
+    setGodModeCode('');
+    setGodModeError(false);
+    playSound(victorySound, 0.28);
+  }
+
   const winnerArmy = winner ? armyForMark(winner) : null;
 
   const status = winnerArmy
@@ -768,6 +801,16 @@ function nextWarrior() {
         >
           <span>DIFFICULTY</span>
           <strong>{difficulty}</strong>
+        </button>
+
+        <button
+          type="button"
+          className={`god-vase-button ${godMode ? 'active' : ''}`}
+          onClick={openGodModeLogin}
+          aria-label={godMode ? 'Deactivate God Mode' : 'Divine access'}
+          title={godMode ? 'God Mode active' : 'Divine access'}
+        >
+          🏺
         </button>
 
         <h1 className="scene-title">
@@ -920,6 +963,64 @@ function nextWarrior() {
             );
           })}
         </div>
+
+        {showGodModeLogin && (
+          <div
+            className="god-mode-backdrop"
+            onClick={() => setShowGodModeLogin(false)}
+          >
+            <div
+              className="god-mode-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Divine access"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <button
+                type="button"
+                className="god-mode-close"
+                onClick={() => setShowGodModeLogin(false)}
+                aria-label="Close divine access"
+              >
+                ×
+              </button>
+
+              <div className="god-mode-vase">🏺</div>
+              <div className="god-mode-kicker">DIVINE ACCESS</div>
+              <h2>AWAKEN THE GODS</h2>
+
+              <input
+                className={godModeError ? 'error' : ''}
+                type="password"
+                value={godModeCode}
+                onChange={(event) => {
+                  setGodModeCode(event.target.value);
+                  setGodModeError(false);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') activateGodMode();
+                }}
+                placeholder="ENTER CODE"
+                autoComplete="off"
+                autoCapitalize="characters"
+                spellCheck={false}
+                autoFocus
+              />
+
+              {godModeError && (
+                <div className="god-mode-error">ACCESS DENIED</div>
+              )}
+
+              <button
+                type="button"
+                className="god-mode-awaken"
+                onClick={activateGodMode}
+              >
+                AWAKEN
+              </button>
+            </div>
+          </div>
+        )}
 
         {showDifficulty && (
           <div
