@@ -298,7 +298,7 @@ main {
   left: 50%;
   z-index: 20;
   transform: translateX(-50%);
-  width: 86%;
+  width: 65%;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr);
   align-items: stretch;
@@ -321,7 +321,7 @@ main {
   align-items: center;
   border: 1px solid rgba(255,255,255,.15);
   border-radius: 10px;
-  background: rgba(5,7,10,.78);
+  background: rgba(5,7,10,.35);
   color: #fff;
   backdrop-filter: blur(5px);
   cursor: pointer;
@@ -682,6 +682,79 @@ main {
 }
 .new-battle:hover,
 .new-battle:focus-visible { background: linear-gradient(#6b5738,#34291c); outline: 1px solid rgba(255,220,145,.65); }
+
+.change-warrior-new {
+  display: inline-block;
+  margin-left: 5px;
+
+  color: #ffd76a;
+  font-size: 7px;
+  font-weight: 1000;
+  letter-spacing: 0.8px;
+
+  text-shadow:
+    0 0 4px rgba(255, 196, 60, 0.8),
+    0 0 8px rgba(255, 170, 30, 0.35);
+
+  animation: newTextPulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes newTextPulse {
+  from {
+    opacity: 0.65;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.view-unlocked-warrior {
+  margin: 8px auto 2px;
+  padding: 8px 14px;
+
+  border: 1px solid rgba(255, 215, 110, 0.65);
+  border-radius: 6px;
+
+  background:
+    linear-gradient(
+      rgba(105, 74, 24, 0.96),
+      rgba(42, 30, 14, 0.98)
+    );
+
+  color: #ffe5a3;
+
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 0 12px rgba(255, 195, 70, 0.18),
+    inset 0 1px rgba(255, 255, 255, 0.12);
+
+  text-shadow: 0 1px 2px #000;
+
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.view-unlocked-warrior:hover {
+  transform: translateY(-1px);
+
+  border-color: rgba(255, 225, 145, 0.95);
+
+  box-shadow:
+    0 0 16px rgba(255, 195, 70, 0.3),
+    inset 0 1px rgba(255, 255, 255, 0.16);
+}
+
+.view-unlocked-warrior:active {
+  transform: translateY(1px);
+}
 
 /* ===== ANIMACIONES ===== */
 @keyframes pieceArrival {

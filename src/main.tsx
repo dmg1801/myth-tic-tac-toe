@@ -154,6 +154,11 @@ type GloryProgress = {
   thorWins: number;
 };
 
+type AcknowledgedWarriors = {
+  zeus: number[];
+  thor: number[];
+};
+
 type UnlockNotice = {
   army: Army;
   wins: number;
@@ -313,6 +318,14 @@ function App() {
   // Progreso permanente: se conserva aunque cierres el navegador.
   const [glory, setGlory] = useState<GloryProgress>(() => loadGloryProgress());
   const [unlockNotice, setUnlockNotice] = useState<UnlockNotice>(null);
+  const [acknowledgedWarriors, setAcknowledgedWarriors] = useState<AcknowledgedWarriors>(() => {
+    try {
+      const saved = localStorage.getItem('zeus-vs-thor-acknowledged-warriors-v1');
+      return saved ? JSON.parse(saved) : { zeus: [0], thor: [0] };
+    } catch {
+      return { zeus: [0], thor: [0] };
+    }
+  });
 
   const [selectedZeusWarrior, setSelectedZeusWarrior] = useState(0);
   const [selectedThorWarrior, setSelectedThorWarrior] = useState(0);
@@ -325,6 +338,24 @@ function App() {
 
   const equippedZeusWarrior = ZEUS_WARRIORS[selectedZeusWarrior];
   const equippedThorWarrior = THOR_WARRIORS[selectedThorWarrior];
+
+  const newZeusWarriors = ZEUS_WARRIORS
+    .map((warrior, index) => ({ warrior, index }))
+    .filter(({ warrior, index }) =>
+      index > 0 &&
+      zeusTotalWins >= warrior.unlockAt &&
+      !acknowledgedWarriors.zeus.includes(index)
+    )
+    .map(({ index }) => index);
+
+  const newThorWarriors = THOR_WARRIORS
+    .map((warrior, index) => ({ warrior, index }))
+    .filter(({ warrior, index }) =>
+      index > 0 &&
+      thorTotalWins >= warrior.unlockAt &&
+      !acknowledgedWarriors.thor.includes(index)
+    )
+    .map(({ index }) => index);
 
   // Dos decisiones independientes:
   // 1) ejército: Zeus/Hoplita o Thor/Ulfsark
@@ -538,6 +569,27 @@ function App() {
     }
   }
 
+  function acknowledgeWarrior(army: Army, slot: number) {
+    setAcknowledgedWarriors(current => {
+      const key = army === ZEUS ? 'zeus' : 'thor';
+      const next = {
+        ...current,
+        [key]: current[key].includes(slot) ? current[key] : [...current[key], slot],
+      };
+      localStorage.setItem('zeus-vs-thor-acknowledged-warriors-v1', JSON.stringify(next));
+      return next;
+    });
+  }
+
+  function viewUnlockedWarrior() {
+    if (!unlockNotice) return;
+    const { army, slot } = unlockNotice;
+    reset();
+    setSelectorArmy(army);
+    setWarriorPreviewIndex(slot);
+    setShowWarriorSelector(true);
+  }
+
   function reset() {
     setBoard(Array(9).fill(null));
     setTurn('X');
@@ -602,13 +654,21 @@ function nextWarrior() {
       setSelectedThorWarrior(warriorPreviewIndex);
     }
 
+    acknowledgeWarrior(selectorArmy, warriorPreviewIndex);
     playSound(previewWarrior.sound, 0.18);
   }
 
   function openWarriorSelector(army: Army) {
     if (battleStarted) return;
+
+    const pendingNew = army === ZEUS ? newZeusWarriors : newThorWarriors;
+    const equippedIndex = army === ZEUS ? selectedZeusWarrior : selectedThorWarrior;
+    const indexToShow = pendingNew.length > 0
+      ? pendingNew[pendingNew.length - 1]
+      : equippedIndex;
+
     setSelectorArmy(army);
-    setWarriorPreviewIndex(army === ZEUS ? selectedZeusWarrior : selectedThorWarrior);
+    setWarriorPreviewIndex(indexToShow);
     setShowWarriorSelector(true);
   }
 
@@ -626,6 +686,8 @@ function nextWarrior() {
     setSelectedThorWarrior(0);
     setWarriorPreviewIndex(0);
     setUnlockNotice(null);
+    setAcknowledgedWarriors({ zeus: [0], thor: [0] });
+    localStorage.removeItem('zeus-vs-thor-acknowledged-warriors-v1');
     playSound(soundForArmy(humanArmy), 0.16);
   }
 
@@ -743,8 +805,16 @@ function nextWarrior() {
               {humanArmy === ZEUS ? 'YOUR WARRIOR' : 'ENEMY WARRIOR'}
             </span>
             <img src={equippedZeusWarrior.image} alt="" />
+            {newZeusWarriors.length > 0 && (
+              <span className="battle-warrior-new">NEW!</span>
+            )}
             <span className="battle-warrior-name">{equippedZeusWarrior.name}</span>
-            <strong>CHANGE ›</strong>
+            <strong>
+              CHANGE ›
+              {newZeusWarriors.length > 0 && (
+                <span className="change-warrior-new">NEW!</span>
+              )}
+            </strong>
           </button>
 
           <div className="battle-warriors-vs">VS</div>
@@ -759,8 +829,16 @@ function nextWarrior() {
               {humanArmy === THOR ? 'YOUR WARRIOR' : 'ENEMY WARRIOR'}
             </span>
             <img src={equippedThorWarrior.image} alt="" />
+            {newThorWarriors.length > 0 && (
+              <span className="battle-warrior-new">NEW!</span>
+            )}
             <span className="battle-warrior-name">{equippedThorWarrior.name}</span>
-            <strong>CHANGE ›</strong>
+            <strong>
+              CHANGE ›
+              {newThorWarriors.length > 0 && (
+                <span className="change-warrior-new">NEW!</span>
+              )}
+            </strong>
           </button>
         </div>
 
@@ -887,6 +965,11 @@ function nextWarrior() {
                   <div className="warrior-modal-lock">🔒</div>
                 )}
 
+                {previewUnlocked &&
+                  (selectorArmy === ZEUS ? newZeusWarriors : newThorWarriors).includes(warriorPreviewIndex) && (
+                    <div className="warrior-modal-new">NEW!</div>
+                  )}
+
                 {previewEquipped && (
                   <div className="warrior-modal-equipped">✓ EQUIPPED</div>
                 )}
@@ -975,6 +1058,13 @@ function nextWarrior() {
                     />
                     <div className="unlock-warrior-name">{unlockedWarrior.name}</div>
                     <span>{unlockNotice.wins} WINS</span>
+                    <button
+                      type="button"
+                      className="view-unlocked-warrior"
+                      onClick={viewUnlockedWarrior}
+                    >
+                      VIEW WARRIOR ›
+                    </button>
                   </div>
                 ) : null;
               })()}
