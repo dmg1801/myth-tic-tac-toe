@@ -64,7 +64,7 @@ const THOR: Army = 'THOR';
 
 const GLORY_STORAGE_KEY = 'zeus-vs-thor-glory-v1';
 const GOD_MODE_CODE = 'OLYMPUS';
-const UNLOCK_LEVELS = [1, 3, 5, 10] as const;
+
 
 type Warrior = {
   id: string;
@@ -549,15 +549,18 @@ function App() {
       );
 
       // ¿Esta victoria acaba de desbloquear un guerrero?
-      const unlockIndex = UNLOCK_LEVELS.indexOf(
-        nextWins as typeof UNLOCK_LEVELS[number]
+      const warriors =
+        humanArmy === ZEUS ? ZEUS_WARRIORS : THOR_WARRIORS;
+
+      const unlockIndex = warriors.findIndex(
+        warrior => warrior.unlockAt === nextWins
       );
 
       if (unlockIndex !== -1) {
         setUnlockNotice({
           army: humanArmy,
           wins: nextWins,
-          slot: unlockIndex + 1,
+          slot: unlockIndex,
         });
       }
 
