@@ -15,6 +15,12 @@ import frostGiantImage from './assets/players/frost-giant.png';
 import helaImage from './assets/players/hela.png';
 import thorImage from './assets/players/thor.png';
 
+import friggaImage from './assets/players/frigg.png';
+import lokiImage from './assets/players/loki.png';
+import odinImage from './assets/players/odin.png';
+import skadiImage from './assets/players/skadi.png';
+import valkyrieImage from './assets/players/valkiria.png';
+
 import aphroditeImage from './assets/players/afrodita.png';
 import poseidonImage from './assets/players/poseidon.png';
 import demeterImage from './assets/players/demeter.png';
@@ -37,7 +43,11 @@ import demeterSound from './assets/sounds/demeter.mp3';
 import hermesSound from './assets/sounds/hermes.mp3';
 import hestaSound from './assets/sounds/hestia.mp3';
 import poseidonSound from './assets/sounds/poseidon.mp3';
-
+import lokiSound from './assets/sounds/loki.mp3';
+import skadiSound from './assets/sounds/skadi.mp3';
+import odinSound from './assets/sounds/odin.mp3';
+import valkyrieSound from './assets/sounds/valkiria.mp3';
+import friggaSound from './assets/sounds/frigg.mp3';
 import defeatSound from './assets/sounds/defeat.mp3';
 import drawSound from './assets/sounds/draw.mp3';
 import ambienceSound from './assets/sounds/ambience.mp3';
@@ -197,11 +207,56 @@ const THOR_WARRIORS: Warrior[] = [
     sound: helSound,
   },
   {
+    id: 'loki',
+    name: 'LOKI',
+    title: 'GOD OF MESSAGING',
+    description: 'Trickster god associated with chaos, cunning, and magic. Loki is known for his shape-shifting abilities and his complex relationship with the other gods.',
+    unlockAt: 7,
+    image: lokiImage,
+    sound: lokiSound,
+  },
+  {
+    id: 'skadi',
+    name: 'SKADI',
+    title: 'GODDESS OF HUNT AND WINTER',
+    description: 'A powerful Norse goddess associated with hunting, winter, and the mountains. Skadi is known for her strength and her role in the myth of the gods.',
+    unlockAt: 10,
+    image: skadiImage,
+    sound: skadiSound,
+  },
+   {
+    id: 'odin',
+    name: 'ODIN',
+    title: 'WISDOM AND MAGIC',
+    description: 'The chief of the Aesir gods and the ruler of Asgard. Odin is associated with wisdom, war, and death.',
+    unlockAt: 12,
+    image: odinImage,
+    sound: odinSound,
+  },
+   {
+    id: 'valkyrie',
+    name: 'VALKYRIE',
+    title: 'CHOOSER OF THE SLAIN',
+    description: 'Female figures in Norse mythology who decide which warriors die in battle and are brought to Valhalla.',
+    unlockAt: 14,
+    image: valkyrieImage,
+    sound: valkyrieSound,
+  },
+   {
+    id: 'Frigga',
+    name: 'FRIGGA',
+    title: 'GODDESS OF MARRIAGE AND FAMILY',
+    description: 'The wife of Odin and the queen of Asgard. Frigga is associated with marriage, fertility, and the domestic sphere.',
+    unlockAt: 16,
+    image: friggaImage,
+    sound: friggaSound,
+  },
+  {
     id: 'thor',
     name: 'THOR',
     title: 'GOD OF THUNDER',
     description: 'Son of Odin and one of the mightiest Norse gods. Thor protects gods and humans and wields the famous hammer Mjölnir.',
-    unlockAt: 10,
+    unlockAt: 20,
     image: thorImage,
     sound: thorSound,
   },
