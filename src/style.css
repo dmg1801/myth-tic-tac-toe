@@ -1176,8 +1176,22 @@ main {
     drop-shadow(0 0 7px rgba(255, 220, 120, 0.38));
 
   animation:
-    piece-enter 0.35s ease-out,
+    pieceArrival 0.35s ease-out,
     human-piece-aura 3.8s ease-in-out infinite;
+}
+
+/* Cuando una ficha humana gana,
+   la animación de victoria tiene prioridad sobre el aura */
+.piece-image.human-piece.winner-zeus {
+  animation:
+    zeusVictoryPulse .65s ease-in-out infinite,
+    pieceArrival .25s ease-out;
+}
+
+.piece-image.human-piece.winner-thor {
+  animation:
+    thorVictoryPulse .65s ease-in-out infinite,
+    pieceArrival .25s ease-out;
 }
 
 @keyframes human-piece-aura {
