@@ -403,14 +403,6 @@ function chooseComputerMove(
   return bestMoves[Math.floor(Math.random() * bestMoves.length)].index;
 }
 
-function playSound(src: string, volume = 0.6) {
-  const audio = new Audio(src);
-  audio.volume = volume;
-
-  audio.play().catch(error => {
-    console.log('No se pudo reproducir el sonido:', error);
-  });
-}
 
 function App() {
   const [board, setBoard] = useState<Cell[]>(Array(9).fill(null));
@@ -424,7 +416,8 @@ function App() {
 
   const ambienceRef = useRef<HTMLAudioElement | null>(null);
   const [musicStarted, setMusicStarted] = useState(false);
-  const [musicMuted, setMusicMuted] = useState(false);
+  const [soundMuted, setSoundMuted] = useState(false);
+  const soundMutedRef = useRef(false);
 
   const [zeusScore, setZeusScore] = useState(0);
   const [thorScore, setThorScore] = useState(0);
@@ -500,6 +493,32 @@ function App() {
   const gameOver = Boolean(winner || draw);
   const winningLine = getWinningLine(board);
 
+  const AUDIO_VOLUME = {
+  ambience: 0.05,
+
+  warrior: 0.14,
+  warriorPreview: 0.12,
+
+  victory: 0.25,
+  defeat: 0.25,
+  draw: 0.22,
+
+  page: 0.10,
+  selection: 0.12,
+  godMode: 0.20,
+} as const;
+
+  function playSound(src: string, volume = 0.6) {
+  if (soundMutedRef.current) return;
+
+  const audio = new Audio(src);
+  audio.volume = volume;
+
+  audio.play().catch(error => {
+    console.log('No se pudo reproducir el sonido:', error);
+  });
+}
+
   function armyForMark(mark: Player): Army {
     return mark === humanMark ? humanArmy : computerArmy;
   }
@@ -511,7 +530,7 @@ function App() {
 }
 
   function volumeForArmy(army: Army) {
-   return 0.18;
+   return AUDIO_VOLUME.warrior;
   }
 
   useEffect(() => {
@@ -575,7 +594,7 @@ function App() {
   useEffect(() => {
     const audio = new Audio(ambienceSound);
     audio.loop = true;
-    audio.volume = 0.05;
+    audio.volume = AUDIO_VOLUME.ambience;
     ambienceRef.current = audio;
 
     return () => {
@@ -594,11 +613,11 @@ function App() {
       setShowResult(true);
 
       if (winner === humanMark) {
-        playSound(victorySound, 0.45);
+        playSound(victorySound, AUDIO_VOLUME.victory);
       } else if (winner === computerMark) {
-        playSound(defeatSound, 0.45);
+        playSound(defeatSound, AUDIO_VOLUME.defeat);
       } else if (draw) {
-        playSound(drawSound, 0.45);
+        playSound(drawSound, AUDIO_VOLUME.draw);
       }
     }, 1200);
 
@@ -646,23 +665,26 @@ function App() {
       });
   }
 
-  function toggleMusic() {
-    const audio = ambienceRef.current;
-    if (!audio) return;
+  function toggleSound() {
+  const nextMuted = !soundMutedRef.current;
 
-    if (!musicStarted) {
-      audio.play()
-        .then(() => {
-          setMusicStarted(true);
-          setMusicMuted(false);
-        })
-        .catch(() => {});
-      return;
-    }
+  soundMutedRef.current = nextMuted;
+  setSoundMuted(nextMuted);
 
-    audio.muted = !audio.muted;
-    setMusicMuted(audio.muted);
+  const ambience = ambienceRef.current;
+
+  if (ambience) {
+    ambience.muted = nextMuted;
   }
+
+  // Si todavía no había empezado la música,
+  // activarla al pulsar 🔊.
+  if (!nextMuted && ambience && !musicStarted) {
+    ambience.play()
+      .then(() => setMusicStarted(true))
+      .catch(() => {});
+  }
+}
 
   function play(index: number) {
     if (thinking || board[index] || gameOver) return;
@@ -744,9 +766,9 @@ function App() {
   const unlocked = currentWins >= warrior.unlockAt;
 
   if (unlocked) {
-    playSound(warrior.sound, 0.18);
+    playSound(warrior.sound, AUDIO_VOLUME.warriorPreview);
   } else {
-    playSound(pageSound, 0.15);
+    playSound(pageSound, AUDIO_VOLUME.page);
   }
 }
 
@@ -764,9 +786,9 @@ function nextWarrior() {
   const unlocked = currentWins >= warrior.unlockAt;
 
   if (unlocked) {
-    playSound(warrior.sound, 0.18);
+    playSound(warrior.sound, AUDIO_VOLUME.warriorPreview);
   } else {
-    playSound(pageSound, 0.15);
+    playSound(pageSound, AUDIO_VOLUME.page);
   }
 }
 
@@ -780,7 +802,7 @@ function nextWarrior() {
     }
 
     acknowledgeWarrior(selectorArmy, warriorPreviewIndex);
-    playSound(previewWarrior.sound, 0.18);
+    playSound(previewWarrior.sound, AUDIO_VOLUME.warriorPreview);
   }
 
   function openWarriorSelector(army: Army) {
@@ -813,13 +835,13 @@ function nextWarrior() {
     setUnlockNotice(null);
     setAcknowledgedWarriors({ zeus: [0], thor: [0] });
     localStorage.removeItem('zeus-vs-thor-acknowledged-warriors-v1');
-    playSound(soundForArmy(humanArmy), 0.16);
+    playSound(soundForArmy(humanArmy), AUDIO_VOLUME.selection);
   }
 
   function selectArmy(army: Army) {
     if (battleStarted) return;
     setHumanArmy(army);
-    playSound(soundForArmy(army), 0.35);
+    playSound(soundForArmy(army), AUDIO_VOLUME.selection);
   }
 
   function selectMark(mark: Player) {
@@ -827,14 +849,14 @@ function nextWarrior() {
     setHumanMark(mark);
 
     // Feedback corto usando el sonido del ejército seleccionado.
-    playSound(soundForArmy(humanArmy), 0.22);
+    playSound(soundForArmy(humanArmy), AUDIO_VOLUME.selection);
   }
 
   function selectDifficulty(level: Difficulty) {
     if (battleStarted) return;
     setDifficulty(level);
     setShowDifficulty(false);
-    playSound(pageSound, 0.12);
+    playSound(pageSound, AUDIO_VOLUME.page);
   }
 
   function openGodModeLogin() {
@@ -852,7 +874,7 @@ function nextWarrior() {
   function activateGodMode() {
     if (godModeCode.trim().toUpperCase() !== GOD_MODE_CODE) {
       setGodModeError(true);
-      playSound(pageSound, 0.12);
+      playSound(pageSound, AUDIO_VOLUME.page);
       return;
     }
 
@@ -860,7 +882,7 @@ function nextWarrior() {
     setShowGodModeLogin(false);
     setGodModeCode('');
     setGodModeError(false);
-    playSound(victorySound, 0.28);
+    playSound(victorySound, AUDIO_VOLUME.godMode);
   }
 
   const winnerArmy = winner ? armyForMark(winner) : null;
@@ -900,10 +922,10 @@ function nextWarrior() {
 
         <button
           className="music-button"
-          onClick={toggleMusic}
-          aria-label={musicMuted ? 'Activar música' : 'Silenciar música'}
+          onClick={toggleSound}
+          aria-label={soundMuted ? 'Activar sonido' : 'Silenciar sonido'}
         >
-          {musicMuted ? '🔇' : '🔊'}
+          {soundMuted ? '🔇' : '🔊'}
         </button>
 
         <button
