@@ -15,6 +15,12 @@ import frostGiantImage from './assets/players/frost-giant.png';
 import helaImage from './assets/players/hela.png';
 import thorImage from './assets/players/thor.png';
 
+import aphroditeImage from './assets/players/afrodita.png';
+import poseidonImage from './assets/players/poseidon.png';
+import demeterImage from './assets/players/demeter.png';
+import hermesImage from './assets/players/hermes.png';
+import hestaImage from './assets/players/hestia.png';
+
 import hopliteSound from './assets/sounds/hoplite.mp3';
 import ulfsarkSound from './assets/sounds/ulfsark.mp3';
 import victorySound from './assets/sounds/victory.mp3';
@@ -26,6 +32,11 @@ import frostGiantSound from './assets/sounds/frost-giant.mp3';
 import helSound from './assets/sounds/hel.mp3';
 import thorSound from './assets/sounds/thor.mp3';
 import freyaSound from './assets/sounds/freya.mp3';
+import aphroditeSound from './assets/sounds/afrodita.mp3';
+import demeterSound from './assets/sounds/demeter.mp3';
+import hermesSound from './assets/sounds/hermes.mp3';
+import hestaSound from './assets/sounds/hestia.mp3';
+import poseidonSound from './assets/sounds/poseidon.mp3';
 
 import defeatSound from './assets/sounds/defeat.mp3';
 import drawSound from './assets/sounds/draw.mp3';
@@ -83,21 +94,66 @@ const ZEUS_WARRIORS: Warrior[] = [
     image: minotaurImage,
     sound: minotaurSound,
   },
+   {
+    id: 'aphrodite',
+    name: 'APRODITE',
+    title: 'GODDESS OF LOVE AND BEAUTY',
+    description: 'Goddess of love, beauty, pleasure, and procreation. Aphrodite was born from the sea foam and is associated with the dove and the rose.',
+    unlockAt: 5,
+    image: aphroditeImage,
+    sound: aphroditeSound,
+  },
   {
     id: 'hades',
     name: 'HADES',
     title: 'LORD OF THE UNDERWORLD',
     description: 'Brother of Zeus and Poseidon. After the gods divided the cosmos, Hades became ruler of the Underworld and the realm of the dead.',
-    unlockAt: 5,
+    unlockAt: 7,
     image: hadesImage,
     sound: hadesSound,
+  },
+  {
+    id: 'Demeter',
+    name: 'DEMETER',
+    title: 'GODDESS OF THE EARTH',
+    description: 'Goddess of the harvest, agriculture, and the seasons. Demeter is associated with the cycle of life and death.',
+    unlockAt: 10,
+    image: demeterImage,
+    sound: demeterSound,
+  },
+  {
+    id: 'Poseidon',
+    name: 'POSEIDON',
+    title: 'GOD OF THE SEA',
+    description: 'Brother of Zeus and Hades. Poseidon is the god of the sea, earthquakes, and horses.',
+    unlockAt: 12,
+    image: poseidonImage,
+    sound: poseidonSound,
+  },
+   {
+    id: 'hesta',
+    name: 'HESTA',
+    title: 'GODDESS OF THE HOME',
+    description: 'Goddess of the hearth, home, and family. Hesta is associated with the sacred fire and the domestic sphere.',
+    unlockAt: 14,
+    image: hestaImage,
+    sound: hestaSound,
+  },
+   {
+    id: 'hermes',
+    name: 'HERMES',
+    title: 'GOD OF MESSAGING',
+    description: 'God of travel, communication, and thieves. Hermes is known for his speed and cunning.',
+    unlockAt: 16,
+    image: hermesImage,
+    sound: hermesSound,
   },
   {
     id: 'zeus',
     name: 'ZEUS',
     title: 'KING OF THE GODS',
     description: 'Ruler of the Olympian gods and master of thunder and lightning. Zeus overthrew the Titans and ruled from Mount Olympus.',
-    unlockAt: 10,
+    unlockAt: 20,
     image: zeusImage,
     sound: zeusSound,
   },
@@ -344,8 +400,8 @@ function App() {
   const [godModeCode, setGodModeCode] = useState('');
   const [godModeError, setGodModeError] = useState(false);
 
-  const zeusTotalWins = godMode ? 10 : glory.zeusWins;
-  const thorTotalWins = godMode ? 10 : glory.thorWins;
+  const zeusTotalWins = godMode ? 20 : glory.zeusWins;
+  const thorTotalWins = godMode ? 20 : glory.thorWins;
 
   const equippedZeusWarrior = ZEUS_WARRIORS[selectedZeusWarrior];
   const equippedThorWarrior = THOR_WARRIORS[selectedThorWarrior];
