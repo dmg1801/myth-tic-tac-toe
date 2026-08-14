@@ -1037,9 +1037,17 @@ function nextWarrior() {
           </button>
         </div>
 
-        <div className="score score-zeus">{zeusScore}</div>
-        <div className="score score-draw">{drawScore}</div>
-        <div className="score score-thor">{thorScore}</div>
+        <div className={`score score-zeus ${battleStarted ? 'score-hidden' : ''}`}>
+          {zeusScore}
+        </div>
+
+        <div className={`score score-draw ${battleStarted ? 'score-hidden' : ''}`}>
+          {drawScore}
+        </div>
+
+        <div className={`score score-thor ${battleStarted ? 'score-hidden' : ''}`}>
+          {thorScore}
+        </div>
 
         <div className={`board-hitbox ${thinking ? 'locked' : ''}`}>
           {board.map((value, index) => {
@@ -1075,6 +1083,7 @@ function nextWarrior() {
                       className={`
                         piece-image
                         piece-enter
+                        ${value === humanMark ? 'human-piece' : ''}
                         ${winningLine?.includes(index)
                           ? pieceArmy === ZEUS
                             ? 'winner-zeus'
@@ -1373,6 +1382,9 @@ function nextWarrior() {
             </div>
           </div>
         )}
+        <div className="game-signature">
+          ZEUS vs THOR · v3.0.0 · a game by @dmongayg
+        </div>
       </section>
     </main>
   );

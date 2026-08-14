@@ -1139,6 +1139,72 @@ main {
   transform: scale(.98);
 }
 
+.score {
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s ease;
+}
+
+.score.score-hidden {
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+}
+
+.game-signature {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 100%;
+  text-align: center;
+
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  opacity: 0.45;
+
+  color: #fff;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Identificación visual de las fichas controladas por el jugador */
+.piece-image.human-piece {
+  filter:
+    drop-shadow(0 0 3px rgba(255, 255, 255, 0.75))
+    drop-shadow(0 0 7px rgba(255, 220, 120, 0.38));
+
+  animation:
+    piece-enter 0.35s ease-out,
+    human-piece-aura 3.8s ease-in-out infinite;
+}
+
+@keyframes human-piece-aura {
+  0%,
+  100% {
+    filter:
+      drop-shadow(0 0 2px rgba(255, 255, 255, 0.55))
+      drop-shadow(0 0 5px rgba(255, 220, 120, 0.25));
+  }
+
+  50% {
+    filter:
+      drop-shadow(0 0 4px rgba(255, 255, 255, 0.85))
+      drop-shadow(0 0 9px rgba(255, 220, 120, 0.48));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .piece-image.human-piece {
+    animation: none;
+
+    filter:
+      drop-shadow(0 0 3px rgba(255, 255, 255, 0.7))
+      drop-shadow(0 0 6px rgba(255, 220, 120, 0.32));
+  }
+}
+
 @keyframes divineVasePulse {
   from { filter: brightness(.9); }
   to { filter: brightness(1.25) drop-shadow(0 0 4px rgba(255, 205, 80, .45)); }
