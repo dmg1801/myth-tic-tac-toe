@@ -1354,3 +1354,89 @@ main {
   .random-rival-quick-icon { font-size: 10px; }
   .random-rival-quick-label { font-size: 4.5px; }
 }
+
+/* ===== MOBILE PERFORMANCE PASS =====
+   En móvil conservamos la estética, pero evitamos trabajo continuo de GPU:
+   - sin respiración infinita de las 9 celdas
+   - aura humana estática
+   - victoria y CTA con ciclos limitados
+   - Random/God Mode con glow estático
+   - menos backdrop-filter en controles permanentes
+*/
+@media (max-width: 600px) {
+  /* Las casillas vacías conservan presencia visual, sin animarse por siempre. */
+  .cell-empty {
+    animation: none;
+    background: rgba(255,255,255,.025);
+    box-shadow: inset 0 0 10px rgba(255,255,255,.035);
+  }
+
+  /* Identificación del jugador: misma idea visual, sin recalcular drop-shadow
+     durante toda la partida. pieceArrival sigue ocurriendo al colocar la ficha. */
+  .piece-image.human-piece {
+    animation: pieceArrival .35s ease-out;
+    filter:
+      drop-shadow(0 0 3px rgba(255,255,255,.72))
+      drop-shadow(0 0 6px rgba(255,220,120,.32));
+  }
+
+  /* La celebración sigue siendo visible, pero termina sola. */
+  .winner-zeus,
+  .piece-image.human-piece.winner-zeus {
+    animation:
+      zeusVictoryPulse .65s ease-in-out 4,
+      pieceArrival .25s ease-out;
+  }
+
+  .winner-thor,
+  .piece-image.human-piece.winner-thor {
+    animation:
+      thorVictoryPulse .65s ease-in-out 4,
+      pieceArrival .25s ease-out;
+  }
+
+  /* El botón llama la atención unas veces y luego deja descansar la GPU. */
+  .new-battle {
+    animation: newBattlePulse 2.2s ease-in-out 3;
+  }
+
+  /* Estos controles mantienen el glow, pero no animan filtros continuamente. */
+  .god-vase-button.active,
+  .random-rival-quick.active {
+    animation: none;
+  }
+
+  .random-rival-quick.active {
+    filter: none;
+  }
+
+  /* Blur permanente sobre la escena es relativamente caro en móviles.
+     Usamos fondos ya suficientemente opacos para conservar legibilidad. */
+  .scene-status,
+  .music-button,
+  .score,
+  .player-selector,
+  .battle-warrior-card,
+  .difficulty-button,
+  .god-vase-button,
+  .random-rival-quick {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Respeta también la preferencia del sistema fuera del breakpoint móvil. */
+@media (prefers-reduced-motion: reduce) {
+  .cell-intro,
+  .cell-empty,
+  .winner-zeus,
+  .winner-thor,
+  .new-battle,
+  .god-vase-button.active,
+  .random-rival-quick.active,
+  .warrior-modal-new,
+  .change-warrior-new {
+    animation: none !important;
+  }
+}
+
