@@ -58,12 +58,14 @@ type Player = 'X' | 'O';
 type Cell = Player | null;
 type Army = 'ZEUS' | 'THOR';
 type Difficulty = 'EASY' | 'MEDIUM' | 'HARD';
+type GameMode = 'CPU' | 'LOCAL';
 
 const ZEUS: Army = 'ZEUS';
 const THOR: Army = 'THOR';
 
 const GLORY_STORAGE_KEY = 'zeus-vs-thor-glory-v1';
 const GOD_MODE_CODE = 'OLYMPUS';
+const WARRIOR_SELECTION_STORAGE_KEY = 'zeus-vs-thor-warrior-selection-v1';
 
 
 type Warrior = {
@@ -404,6 +406,35 @@ function chooseComputerMove(
 }
 
 
+function loadSavedWarriorSelection(
+  warriors: Warrior[],
+  wins: number,
+  army: 'zeus' | 'thor'
+): number {
+  try {
+    const saved = localStorage.getItem(WARRIOR_SELECTION_STORAGE_KEY);
+
+    if (!saved) return 0;
+
+    const parsed = JSON.parse(saved);
+    const savedId = parsed[army];
+
+    const index = warriors.findIndex(
+      warrior => warrior.id === savedId
+    );
+
+    if (index === -1) return 0;
+
+    // Si ya no está desbloqueado, volvemos al guerrero inicial.
+    if (wins < warriors[index].unlockAt) return 0;
+
+    return index;
+  } catch {
+    return 0;
+  }
+}
+
+
 function App() {
   const [board, setBoard] = useState<Cell[]>(Array(9).fill(null));
   const [turn, setTurn] = useState<Player>('X');
@@ -411,6 +442,7 @@ function App() {
   const [showResult, setShowResult] = useState(false);
   const [boardIntro, setBoardIntro] = useState(true);
   const [battleStarted, setBattleStarted] = useState(false);
+  const [gameMode, setGameMode] = useState<GameMode>('CPU');
   const [difficulty, setDifficulty] = useState<Difficulty>('MEDIUM');
   const [showDifficulty, setShowDifficulty] = useState(false);
 
@@ -436,8 +468,21 @@ function App() {
     }
   });
 
-  const [selectedZeusWarrior, setSelectedZeusWarrior] = useState(0);
-  const [selectedThorWarrior, setSelectedThorWarrior] = useState(0);
+ const [selectedZeusWarrior, setSelectedZeusWarrior] = useState(() =>
+  loadSavedWarriorSelection(
+    ZEUS_WARRIORS,
+    glory.zeusWins,
+    'zeus'
+  )
+);
+
+const [selectedThorWarrior, setSelectedThorWarrior] = useState(() =>
+  loadSavedWarriorSelection(
+    THOR_WARRIORS,
+    glory.thorWins,
+    'thor'
+  )
+);
   const [warriorPreviewIndex, setWarriorPreviewIndex] = useState(0);
   const [showWarriorSelector, setShowWarriorSelector] = useState(false);
   const [selectorArmy, setSelectorArmy] = useState<Army>(ZEUS);
@@ -551,40 +596,42 @@ function App() {
 
   // GLORY SOLO se obtiene cuando gana el jugador humano.
   if (winner === humanMark) {
-    setGlory(current => {
-      const nextWins =
-        humanArmy === ZEUS
-          ? current.zeusWins + 1
-          : current.thorWins + 1;
+   if (gameMode === 'CPU') {
+  setGlory(current => {
+    const nextWins =
+      humanArmy === ZEUS
+        ? current.zeusWins + 1
+        : current.thorWins + 1;
 
-      const next: GloryProgress =
-        humanArmy === ZEUS
-          ? { ...current, zeusWins: nextWins }
-          : { ...current, thorWins: nextWins };
+    const next: GloryProgress =
+      humanArmy === ZEUS
+        ? { ...current, zeusWins: nextWins }
+        : { ...current, thorWins: nextWins };
 
-      localStorage.setItem(
-        GLORY_STORAGE_KEY,
-        JSON.stringify(next)
-      );
+    localStorage.setItem(
+      GLORY_STORAGE_KEY,
+      JSON.stringify(next)
+    );
 
-      // ¿Esta victoria acaba de desbloquear un guerrero?
-      const warriors =
-        humanArmy === ZEUS ? ZEUS_WARRIORS : THOR_WARRIORS;
+    // ¿Esta victoria acaba de desbloquear un guerrero?
+    const warriors =
+      humanArmy === ZEUS ? ZEUS_WARRIORS : THOR_WARRIORS;
 
-      const unlockIndex = warriors.findIndex(
-        warrior => warrior.unlockAt === nextWins
-      );
+    const unlockIndex = warriors.findIndex(
+      warrior => warrior.unlockAt === nextWins
+    );
 
-      if (unlockIndex !== -1) {
-        setUnlockNotice({
-          army: humanArmy,
-          wins: nextWins,
-          slot: unlockIndex,
-        });
-      }
+    if (unlockIndex !== -1) {
+      setUnlockNotice({
+        army: humanArmy,
+        wins: nextWins,
+        slot: unlockIndex,
+      });
+    }
 
-      return next;
-    });
+    return next;
+  });
+}
   }
 } else if (draw) {
       setDrawScore(score => score + 1);
@@ -627,10 +674,15 @@ function App() {
   useEffect(() => {
     // La IA no puede empezar hasta que el jugador haya confirmado la batalla
     // tocando el tablero. Así siempre puedes cambiar ejército y X/O tras NEW BATTLE.
-    if (!battleStarted || turn !== computerMark || gameOver) {
-      setThinking(false);
-      return;
-    }
+   if (
+        gameMode !== 'CPU' ||
+        !battleStarted ||
+        turn !== computerMark ||
+        gameOver
+      ) {
+        setThinking(false);
+        return;
+      }
 
     setThinking(true);
     const delay = 1000 + Math.random() * 400;
@@ -652,7 +704,14 @@ function App() {
     }, delay);
 
     return () => window.clearTimeout(timer);
-  }, [battleStarted, turn, gameOver, computerMark, humanMark, computerArmy, difficulty]);
+  }, [gameMode,
+  battleStarted,
+  turn,
+  gameOver,
+  computerMark,
+  humanMark,
+  computerArmy,
+  difficulty]);
 
   function startAmbience() {
     const audio = ambienceRef.current;
@@ -686,35 +745,64 @@ function App() {
   }
 }
 
-  function play(index: number) {
-    if (thinking || board[index] || gameOver) return;
+ function play(index: number) {
+  if (thinking || board[index] || gameOver) return;
 
-    // El primer toque confirma ejército + X/O y comienza la batalla.
-    if (!battleStarted) {
-      startAmbience();
-      setBoardIntro(false);
-      setBattleStarted(true);
+  // El primer toque confirma la configuración y comienza la batalla.
+  if (!battleStarted) {
+    startAmbience();
+    setBoardIntro(false);
+    setBattleStarted(true);
 
-      // Si elegiste O, el primer toque solo da comienzo a la batalla:
-      // la IA, que es X, hará la primera jugada.
-      if (humanMark === 'O') {
-        setTurn('X');
-        return;
-      }
-    }
-
-    if (turn !== humanMark) return;
-
-    const next = [...board];
-    next[index] = humanMark;
-    setBoard(next);
-
-    playSound(soundForArmy(humanArmy), volumeForArmy(humanArmy));
-
-    if (!getWinner(next) && !next.every(Boolean)) {
-      setTurn(computerMark);
+    // VS CPU:
+    // si el humano eligió O, la CPU juega primero como X.
+    if (gameMode === 'CPU' && humanMark === 'O') {
+      setTurn('X');
+      return;
     }
   }
+
+  // =========================
+  // LOCAL 2 PLAYERS
+  // =========================
+  if (gameMode === 'LOCAL') {
+    const next = [...board];
+    next[index] = turn;
+
+    setBoard(next);
+
+    const currentArmy = armyForMark(turn);
+
+    playSound(
+      soundForArmy(currentArmy),
+      volumeForArmy(currentArmy)
+    );
+
+    if (!getWinner(next) && !next.every(Boolean)) {
+      setTurn(current => current === 'X' ? 'O' : 'X');
+    }
+
+    return;
+  }
+
+  // =========================
+  // VS CPU
+  // =========================
+  if (turn !== humanMark) return;
+
+  const next = [...board];
+  next[index] = humanMark;
+  setBoard(next);
+
+  playSound(
+    soundForArmy(humanArmy),
+    volumeForArmy(humanArmy)
+  );
+
+  if (!getWinner(next) && !next.every(Boolean)) {
+    setTurn(computerMark);
+  }
+}
 
   function acknowledgeWarrior(army: Army, slot: number) {
     setAcknowledgedWarriors(current => {
@@ -793,17 +881,41 @@ function nextWarrior() {
 }
 
   function equipPreviewWarrior() {
-    if (battleStarted || !previewUnlocked) return;
+  if (battleStarted || !previewUnlocked) return;
 
-    if (selectorArmy === ZEUS) {
-      setSelectedZeusWarrior(warriorPreviewIndex);
-    } else {
-      setSelectedThorWarrior(warriorPreviewIndex);
-    }
-
-    acknowledgeWarrior(selectorArmy, warriorPreviewIndex);
-    playSound(previewWarrior.sound, AUDIO_VOLUME.warriorPreview);
+  if (selectorArmy === ZEUS) {
+    setSelectedZeusWarrior(warriorPreviewIndex);
+  } else {
+    setSelectedThorWarrior(warriorPreviewIndex);
   }
+
+  // Guardar los IDs de los guerreros actualmente seleccionados.
+  try {
+    const saved = localStorage.getItem(WARRIOR_SELECTION_STORAGE_KEY);
+
+    const currentSelection = saved
+      ? JSON.parse(saved)
+      : {
+          zeus: ZEUS_WARRIORS[0].id,
+          thor: THOR_WARRIORS[0].id,
+        };
+
+    const nextSelection = {
+      ...currentSelection,
+      [selectorArmy === ZEUS ? 'zeus' : 'thor']: previewWarrior.id,
+    };
+
+    localStorage.setItem(
+      WARRIOR_SELECTION_STORAGE_KEY,
+      JSON.stringify(nextSelection)
+    );
+  } catch {
+    // Si localStorage falla, simplemente seguimos jugando.
+  }
+
+  acknowledgeWarrior(selectorArmy, warriorPreviewIndex);
+  playSound(previewWarrior.sound, AUDIO_VOLUME.warriorPreview);
+}
 
   function openWarriorSelector(army: Army) {
     if (battleStarted) return;
@@ -835,6 +947,7 @@ function nextWarrior() {
     setUnlockNotice(null);
     setAcknowledgedWarriors({ zeus: [0], thor: [0] });
     localStorage.removeItem('zeus-vs-thor-acknowledged-warriors-v1');
+    localStorage.removeItem(WARRIOR_SELECTION_STORAGE_KEY);
     playSound(soundForArmy(humanArmy), AUDIO_VOLUME.selection);
   }
 
@@ -897,6 +1010,13 @@ function nextWarrior() {
       ? equippedZeusWarrior
       : equippedThorWarrior;
 
+  const localCurrentArmy = armyForMark(turn);
+
+  const localCurrentWarrior =
+    localCurrentArmy === ZEUS
+      ? equippedZeusWarrior
+      : equippedThorWarrior;
+
   const status = winnerArmy
     ? winnerArmy === ZEUS
       ? 'Zeus Victory'
@@ -907,10 +1027,11 @@ function nextWarrior() {
         ? humanMark === 'X'
           ? 'Choose your side · You play first'
           : 'Choose your side · You play second'
-        : thinking
-          ? `Enemy turn · ${enemyWarrior.name}`
-          : `Your turn · ${humanWarrior.name}`;
-
+        : gameMode === 'LOCAL'
+          ? `${turn === 'X' ? 'PLAYER 1' : 'PLAYER 2'} TURN · ${localCurrentWarrior.name}`
+          : thinking
+            ? `Enemy turn · ${enemyWarrior.name}`
+            : `Your turn · ${humanWarrior.name}`;
   const resultTitle = winner
     ? winner === humanMark
       ? 'YOU WON'
@@ -947,12 +1068,16 @@ function nextWarrior() {
           className={`difficulty-button ${battleStarted ? 'locked' : ''}`}
           onClick={() => setShowDifficulty(true)}
           disabled={battleStarted}
-          aria-label={`Difficulty: ${difficulty}`}
+          aria-label="Battle mode"
         >
-          <span>DIFFICULTY</span>
-          <strong>{difficulty}</strong>
-        </button>
+          <span>BATTLE MODE</span>
 
+          <strong>
+            {gameMode === 'CPU'
+              ? `VS CPU · ${difficulty}`
+              : '2 PLAYERS'}
+          </strong>
+        </button>
         <button
           type="button"
           className={`god-vase-button ${godMode ? 'active' : ''}`}
@@ -973,11 +1098,19 @@ function nextWarrior() {
           {battleStarted && !gameOver ? (
             <>
               <img
-                className={`status-warrior-image ${
-                  !thinking ? 'status-warrior-human' : ''
+               className={`status-warrior-image ${
+                  gameMode === 'LOCAL' || !thinking
+                    ? 'status-warrior-human'
+                    : ''
                 }`}
-                src={thinking ? enemyWarrior.image : humanWarrior.image}
-                alt=""
+              src={
+                  gameMode === 'LOCAL'
+                    ? localCurrentWarrior.image
+                    : thinking
+                      ? enemyWarrior.image
+                      : humanWarrior.image
+                }
+                alt="gods exist"
               />
 
               <span className="status-warrior-text">
@@ -1035,7 +1168,7 @@ function nextWarrior() {
             <span className="battle-warrior-role">
               {humanArmy === ZEUS ? 'YOUR WARRIOR' : 'ENEMY WARRIOR'}
             </span>
-            <img src={equippedZeusWarrior.image} alt="" />
+            <img src={equippedZeusWarrior.image} alt={equippedZeusWarrior.name} />
             <span className="battle-warrior-name">{equippedZeusWarrior.name}</span>
             <strong>
               CHANGE ›
@@ -1056,7 +1189,7 @@ function nextWarrior() {
             <span className="battle-warrior-role">
               {humanArmy === THOR ? 'YOUR WARRIOR' : 'ENEMY WARRIOR'}
             </span>
-            <img src={equippedThorWarrior.image} alt="" />
+            <img src={equippedThorWarrior.image} alt={equippedThorWarrior.name} />
             <span className="battle-warrior-name">{equippedThorWarrior.name}</span>
             <strong>
               CHANGE ›
@@ -1094,7 +1227,16 @@ function nextWarrior() {
                 }`}
                 key={index}
                 onClick={() => play(index)}
-                disabled={thinking || gameOver || Boolean(value) || (battleStarted && turn !== humanMark)}
+                disabled={
+                  thinking ||
+                  gameOver ||
+                  Boolean(value) ||
+                  (
+                    gameMode === 'CPU' &&
+                    battleStarted &&
+                    turn !== humanMark
+                  )
+                }
                 aria-label={`Casilla ${index + 1}`}
               >
                 {value && pieceArmy && (
@@ -1218,28 +1360,64 @@ function nextWarrior() {
                 ×
               </button>
 
-              <div className="difficulty-kicker">CHOOSE YOUR CHALLENGE</div>
-              <h2>DIFFICULTY</h2>
+              <div className="difficulty-kicker">
+                CHOOSE HOW TO BATTLE
+              </div>
+
+              <h2>BATTLE MODE</h2>
 
               <div className="difficulty-options">
-                {(['EASY', 'MEDIUM', 'HARD'] as Difficulty[]).map(level => (
-                  <button
-                    type="button"
-                    key={level}
-                    className={`difficulty-option ${difficulty === level ? 'selected' : ''}`}
-                    onClick={() => selectDifficulty(level)}
-                  >
-                    <strong>{level}</strong>
-                    <span>
-                      {level === 'EASY'
-                        ? 'Forgiving opponent'
-                        : level === 'MEDIUM'
-                          ? 'Balanced battle'
-                          : 'Perfect strategy'}
-                    </span>
-                  </button>
-                ))}
+
+                <button
+                  type="button"
+                  className={`difficulty-option ${gameMode === 'CPU' ? 'selected' : ''}`}
+                  onClick={() => setGameMode('CPU')}
+                >
+                  <strong>⚔ VS CPU</strong>
+                  <span>Battle the gods</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={`difficulty-option ${gameMode === 'LOCAL' ? 'selected' : ''}`}
+                  onClick={() => setGameMode('LOCAL')}
+                >
+                  <strong>👥 2 PLAYERS</strong>
+                  <span>Share this device</span>
+                </button>
+
               </div>
+
+              {gameMode === 'CPU' && (
+                <>
+                  <div className="difficulty-kicker">
+                    CHOOSE YOUR CHALLENGE
+                  </div>
+
+                  <div className="difficulty-options">
+                    {(['EASY', 'MEDIUM', 'HARD'] as Difficulty[]).map(level => (
+                      <button
+                        type="button"
+                        key={level}
+                        className={`difficulty-option ${
+                          difficulty === level ? 'selected' : ''
+                        }`}
+                        onClick={() => selectDifficulty(level)}
+                      >
+                        <strong>{level}</strong>
+
+                        <span>
+                          {level === 'EASY'
+                            ? 'Forgiving opponent'
+                            : level === 'MEDIUM'
+                              ? 'Balanced battle'
+                              : 'Perfect strategy'}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
