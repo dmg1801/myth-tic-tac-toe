@@ -63,9 +63,11 @@ type GameMode = 'CPU' | 'LOCAL';
 const ZEUS: Army = 'ZEUS';
 const THOR: Army = 'THOR';
 
-const GLORY_STORAGE_KEY = 'zeus-vs-thor-glory-v1';
+const GLORY_STORAGE_KEY = 'zeus-vs-thor-glory-v2';
 const GOD_MODE_CODE = 'OLYMPUS';
 const WARRIOR_SELECTION_STORAGE_KEY = 'zeus-vs-thor-warrior-selection-v1';
+const RANDOM_RIVAL_STORAGE_KEY = 'zeus-vs-thor-random-rival-v1';
+const ACKNOWLEDGED_WARRIORS_STORAGE_KEY = 'zeus-vs-thor-acknowledged-warriors-v2';
 
 
 type Warrior = {
@@ -435,6 +437,16 @@ function loadSavedWarriorSelection(
 }
 
 
+function loadRandomRivalPreference(): boolean {
+  try {
+    const saved = localStorage.getItem(RANDOM_RIVAL_STORAGE_KEY);
+    if (saved === null) return true;
+    return saved === 'true';
+  } catch {
+    return true;
+  }
+}
+
 function App() {
   const [board, setBoard] = useState<Cell[]>(Array(9).fill(null));
   const [turn, setTurn] = useState<Player>('X');
@@ -445,6 +457,8 @@ function App() {
   const [gameMode, setGameMode] = useState<GameMode>('CPU');
   const [difficulty, setDifficulty] = useState<Difficulty>('MEDIUM');
   const [showDifficulty, setShowDifficulty] = useState(false);
+  const [randomRival, setRandomRival] = useState<boolean>(() => loadRandomRivalPreference());
+  const [randomEnemyWarrior, setRandomEnemyWarrior] = useState<Warrior | null>(null);
 
   const ambienceRef = useRef<HTMLAudioElement | null>(null);
   const [musicStarted, setMusicStarted] = useState(false);
@@ -461,7 +475,7 @@ function App() {
   const [unlockNotice, setUnlockNotice] = useState<UnlockNotice>(null);
   const [acknowledgedWarriors, setAcknowledgedWarriors] = useState<AcknowledgedWarriors>(() => {
     try {
-      const saved = localStorage.getItem('zeus-vs-thor-acknowledged-warriors-v1');
+      const saved = localStorage.getItem(ACKNOWLEDGED_WARRIORS_STORAGE_KEY);
       return saved ? JSON.parse(saved) : { zeus: [0], thor: [0] };
     } catch {
       return { zeus: [0], thor: [0] };
@@ -516,6 +530,10 @@ const [selectedThorWarrior, setSelectedThorWarrior] = useState(() =>
       !acknowledgedWarriors.thor.includes(index)
     )
     .map(({ index }) => index);
+
+  const unlockedWarrior = unlockNotice
+    ? (unlockNotice.army === ZEUS ? ZEUS_WARRIORS : THOR_WARRIORS)[unlockNotice.slot]
+    : null;
 
   // Dos decisiones independientes:
   // 1) ejército: Zeus/Hoplita o Thor/Ulfsark
@@ -598,13 +616,18 @@ const [selectedThorWarrior, setSelectedThorWarrior] = useState(() =>
   if (winner === humanMark) {
    if (gameMode === 'CPU') {
   setGlory(current => {
+    // GLORY representa el progreso CONTRA cada panteón.
+    // Si ganas con los griegos, avanzas/desbloqueas nórdicos;
+    // si ganas con los nórdicos, avanzas/desbloqueas griegos.
+    const defeatedArmy = computerArmy;
+
     const nextWins =
-      humanArmy === ZEUS
+      defeatedArmy === ZEUS
         ? current.zeusWins + 1
         : current.thorWins + 1;
 
     const next: GloryProgress =
-      humanArmy === ZEUS
+      defeatedArmy === ZEUS
         ? { ...current, zeusWins: nextWins }
         : { ...current, thorWins: nextWins };
 
@@ -615,7 +638,7 @@ const [selectedThorWarrior, setSelectedThorWarrior] = useState(() =>
 
     // ¿Esta victoria acaba de desbloquear un guerrero?
     const warriors =
-      humanArmy === ZEUS ? ZEUS_WARRIORS : THOR_WARRIORS;
+      defeatedArmy === ZEUS ? ZEUS_WARRIORS : THOR_WARRIORS;
 
     const unlockIndex = warriors.findIndex(
       warrior => warrior.unlockAt === nextWins
@@ -623,7 +646,7 @@ const [selectedThorWarrior, setSelectedThorWarrior] = useState(() =>
 
     if (unlockIndex !== -1) {
       setUnlockNotice({
-        army: humanArmy,
+        army: defeatedArmy,
         wins: nextWins,
         slot: unlockIndex,
       });
@@ -636,7 +659,7 @@ const [selectedThorWarrior, setSelectedThorWarrior] = useState(() =>
 } else if (draw) {
       setDrawScore(score => score + 1);
     }
-  }, [gameOver, winner, draw, humanArmy, humanMark]);
+  }, [gameOver, winner, draw, humanArmy, humanMark, computerArmy, gameMode]);
 
   useEffect(() => {
     const audio = new Audio(ambienceSound);
@@ -688,14 +711,19 @@ const [selectedThorWarrior, setSelectedThorWarrior] = useState(() =>
     const delay = 1000 + Math.random() * 400;
 
     const timer = window.setTimeout(() => {
-      setBoard(currentBoard => {
+      setBoard((currentBoard: any[]) => {
         if (getWinner(currentBoard) || currentBoard.every(Boolean)) return currentBoard;
 
         const move = chooseComputerMove(currentBoard, computerMark, humanMark, difficulty);
         const next = [...currentBoard];
         next[move] = computerMark;
 
-        playSound(soundForArmy(computerArmy), volumeForArmy(computerArmy));
+       playSound(
+        randomRival && randomEnemyWarrior
+          ? randomEnemyWarrior.sound
+          : soundForArmy(computerArmy),
+        AUDIO_VOLUME.warrior
+      );
         return next;
       });
 
@@ -750,17 +778,15 @@ const [selectedThorWarrior, setSelectedThorWarrior] = useState(() =>
 
   // El primer toque confirma la configuración y comienza la batalla.
   if (!battleStarted) {
-    startAmbience();
-    setBoardIntro(false);
-    setBattleStarted(true);
+  startAmbience();
+  setBoardIntro(false);
+  setBattleStarted(true);
 
-    // VS CPU:
-    // si el humano eligió O, la CPU juega primero como X.
-    if (gameMode === 'CPU' && humanMark === 'O') {
-      setTurn('X');
-      return;
-    }
+  if (gameMode === 'CPU' && humanMark === 'O') {
+    setTurn('X');
+    return;
   }
+}
 
   // =========================
   // LOCAL 2 PLAYERS
@@ -811,7 +837,7 @@ const [selectedThorWarrior, setSelectedThorWarrior] = useState(() =>
         ...current,
         [key]: current[key].includes(slot) ? current[key] : [...current[key], slot],
       };
-      localStorage.setItem('zeus-vs-thor-acknowledged-warriors-v1', JSON.stringify(next));
+      localStorage.setItem(ACKNOWLEDGED_WARRIORS_STORAGE_KEY, JSON.stringify(next));
       return next;
     });
   }
@@ -836,9 +862,9 @@ const [selectedThorWarrior, setSelectedThorWarrior] = useState(() =>
     resultCounted.current = false;
   }
 
-  function startNewBattle() {
-    reset();
-  }
+ function startNewBattle() {
+  reset();
+}
 
  function previousWarrior() {
   if (battleStarted) return;
@@ -913,6 +939,19 @@ function nextWarrior() {
     // Si localStorage falla, simplemente seguimos jugando.
   }
 
+  // Si el jugador equipa manualmente una ficha del bando rival,
+  // su elección tiene prioridad sobre RANDOM RIVAL.
+  if (gameMode === 'CPU' && selectorArmy === computerArmy) {
+    setRandomRival(false);
+    setRandomEnemyWarrior(null);
+
+    try {
+      localStorage.setItem(RANDOM_RIVAL_STORAGE_KEY, 'false');
+    } catch {
+      // Si localStorage falla, la selección manual sigue funcionando.
+    }
+  }
+
   acknowledgeWarrior(selectorArmy, warriorPreviewIndex);
   playSound(previewWarrior.sound, AUDIO_VOLUME.warriorPreview);
 }
@@ -946,7 +985,7 @@ function nextWarrior() {
     setWarriorPreviewIndex(0);
     setUnlockNotice(null);
     setAcknowledgedWarriors({ zeus: [0], thor: [0] });
-    localStorage.removeItem('zeus-vs-thor-acknowledged-warriors-v1');
+    localStorage.removeItem(ACKNOWLEDGED_WARRIORS_STORAGE_KEY);
     localStorage.removeItem(WARRIOR_SELECTION_STORAGE_KEY);
     playSound(soundForArmy(humanArmy), AUDIO_VOLUME.selection);
   }
@@ -964,6 +1003,124 @@ function nextWarrior() {
     // Feedback corto usando el sonido del ejército seleccionado.
     playSound(soundForArmy(humanArmy), AUDIO_VOLUME.selection);
   }
+
+  function chooseRandomEnemy(force = false) {
+  if (gameMode !== 'CPU' || (!randomRival && !force)) {
+    setRandomEnemyWarrior(null);
+    return;
+  }
+
+  const warriors =
+    computerArmy === ZEUS
+      ? ZEUS_WARRIORS
+      : THOR_WARRIORS;
+
+  const wins =
+    computerArmy === ZEUS
+      ? zeusTotalWins
+      : thorTotalWins;
+
+  const unlockedWarriors = warriors.filter(
+    warrior => wins >= warrior.unlockAt
+  );
+
+  if (unlockedWarriors.length === 0) {
+    setRandomEnemyWarrior(null);
+    return;
+  }
+
+  const candidates =
+    unlockedWarriors.length > 1 && randomEnemyWarrior
+      ? unlockedWarriors.filter(
+          warrior => warrior.id !== randomEnemyWarrior.id
+        )
+      : unlockedWarriors;
+
+  const randomWarrior =
+    candidates[Math.floor(Math.random() * candidates.length)];
+
+  setRandomEnemyWarrior(randomWarrior);
+}
+
+  function toggleRandomRival() {
+    if (gameMode !== 'CPU' || battleStarted) return;
+
+    const nextRandom = !randomRival;
+
+    // Al apagar RANDOM, conservamos como selección manual el rival
+    // que estaba visible. Así la tarjeta no cambia de golpe.
+    if (!nextRandom && randomEnemyWarrior) {
+      const warriors =
+        computerArmy === ZEUS
+          ? ZEUS_WARRIORS
+          : THOR_WARRIORS;
+
+      const selectedIndex = warriors.findIndex(
+        warrior => warrior.id === randomEnemyWarrior.id
+      );
+
+      if (selectedIndex !== -1) {
+        if (computerArmy === ZEUS) {
+          setSelectedZeusWarrior(selectedIndex);
+        } else {
+          setSelectedThorWarrior(selectedIndex);
+        }
+
+        try {
+          const saved = localStorage.getItem(WARRIOR_SELECTION_STORAGE_KEY);
+          const currentSelection = saved
+            ? JSON.parse(saved)
+            : {
+                zeus: ZEUS_WARRIORS[0].id,
+                thor: THOR_WARRIORS[0].id,
+              };
+
+          localStorage.setItem(
+            WARRIOR_SELECTION_STORAGE_KEY,
+            JSON.stringify({
+              ...currentSelection,
+              [computerArmy === ZEUS ? 'zeus' : 'thor']:
+                randomEnemyWarrior.id,
+            })
+          );
+        } catch {
+          // La selección sigue funcionando aunque falle localStorage.
+        }
+      }
+    }
+
+    setRandomRival(nextRandom);
+
+    try {
+      localStorage.setItem(
+        RANDOM_RIVAL_STORAGE_KEY,
+        String(nextRandom)
+      );
+    } catch {
+      // La preferencia seguirá activa durante esta sesión.
+    }
+
+    if (nextRandom) {
+      chooseRandomEnemy(true);
+    } else {
+      setRandomEnemyWarrior(null);
+    }
+
+    playSound(pageSound, AUDIO_VOLUME.page);
+  }
+
+  // RANDOM RIVAL se decide antes de empezar cada batalla, para que el
+  // jugador pueda ver al rival en la tarjeta antes de tocar el tablero.
+  useEffect(() => {
+    if (gameMode !== 'CPU' || battleStarted) return;
+
+    if (randomRival) {
+      chooseRandomEnemy(true);
+    } else {
+      setRandomEnemyWarrior(null);
+    }
+  }, [gameMode, battleStarted, randomRival, humanArmy, godMode]);
+
 
   function selectDifficulty(level: Difficulty) {
     if (battleStarted) return;
@@ -1005,10 +1162,25 @@ function nextWarrior() {
     ? equippedZeusWarrior
     : equippedThorWarrior;
 
-  const enemyWarrior =
+  const selectedEnemyWarrior =
     computerArmy === ZEUS
       ? equippedZeusWarrior
       : equippedThorWarrior;
+
+  const enemyWarrior =
+    gameMode === 'CPU' && randomRival && randomEnemyWarrior
+      ? randomEnemyWarrior
+      : selectedEnemyWarrior;
+
+  const displayedZeusWarrior =
+  gameMode === 'CPU' && computerArmy === ZEUS
+    ? enemyWarrior
+    : equippedZeusWarrior;
+
+const displayedThorWarrior =
+  gameMode === 'CPU' && computerArmy === THOR
+    ? enemyWarrior
+    : equippedThorWarrior;
 
   const localCurrentArmy = armyForMark(turn);
 
@@ -1163,13 +1335,19 @@ function nextWarrior() {
             className={`battle-warrior-card zeus ${humanArmy === ZEUS ? 'human' : 'enemy'}`}
             onClick={() => openWarriorSelector(ZEUS)}
             disabled={battleStarted}
-            aria-label={`Change Greek warrior. Current warrior: ${equippedZeusWarrior.name}`}
+            aria-label={`Change Greek warrior. Current warrior: ${displayedZeusWarrior.name}`}
           >
             <span className="battle-warrior-role">
               {humanArmy === ZEUS ? 'YOUR WARRIOR' : 'ENEMY WARRIOR'}
             </span>
-            <img src={equippedZeusWarrior.image} alt={equippedZeusWarrior.name} />
-            <span className="battle-warrior-name">{equippedZeusWarrior.name}</span>
+           <img
+              src={displayedZeusWarrior.image}
+              alt={displayedZeusWarrior.name}
+            />
+
+            <span className="battle-warrior-name">
+              {displayedZeusWarrior.name}
+            </span>
             <strong>
               CHANGE ›
               {newZeusWarriors.length > 0 && (
@@ -1180,17 +1358,45 @@ function nextWarrior() {
 
           <div className="battle-warriors-vs">VS</div>
 
+          {gameMode === 'CPU' && (
+            <button
+              type="button"
+              className={`random-rival-quick ${
+                randomRival ? 'active' : 'inactive'
+              } ${
+                computerArmy === ZEUS ? 'on-zeus' : 'on-thor'
+              }`}
+              onClick={toggleRandomRival}
+              disabled={battleStarted}
+              aria-label={
+                randomRival
+                  ? 'Disable random rival'
+                  : 'Enable random rival'
+              }
+              title={
+                randomRival
+                  ? 'Random rival ON'
+                  : 'Random rival OFF'
+              }
+            >
+              <span className="random-rival-quick-icon">🎲</span>
+              <span className="random-rival-quick-label">
+                {randomRival ? 'RANDOM' : 'SELECTED'}
+              </span>
+            </button>
+          )}
+
           <button
             className={`battle-warrior-card thor ${humanArmy === THOR ? 'human' : 'enemy'}`}
             onClick={() => openWarriorSelector(THOR)}
             disabled={battleStarted}
-            aria-label={`Change Norse warrior. Current warrior: ${equippedThorWarrior.name}`}
+            aria-label={`Change Norse warrior. Current warrior: ${displayedThorWarrior.name}`}
           >
             <span className="battle-warrior-role">
               {humanArmy === THOR ? 'YOUR WARRIOR' : 'ENEMY WARRIOR'}
             </span>
-            <img src={equippedThorWarrior.image} alt={equippedThorWarrior.name} />
-            <span className="battle-warrior-name">{equippedThorWarrior.name}</span>
+            <img src={displayedThorWarrior.image} alt={displayedThorWarrior.name} />
+            <span className="battle-warrior-name">{displayedThorWarrior.name}</span>
             <strong>
               CHANGE ›
               {newThorWarriors.length > 0 && (
@@ -1264,15 +1470,25 @@ function nextWarrior() {
                         }
                       `}
                       src={
-                        pieceArmy === ZEUS
-                          ? equippedZeusWarrior.image
-                          : equippedThorWarrior.image
-                      }
-                      alt={
-                        pieceArmy === ZEUS
-                          ? equippedZeusWarrior.name
-                          : equippedThorWarrior.name
-                      }
+                          gameMode === 'CPU' &&
+                          randomRival &&
+                          pieceArmy === computerArmy &&
+                          randomEnemyWarrior
+                            ? randomEnemyWarrior.image
+                            : pieceArmy === ZEUS
+                              ? equippedZeusWarrior.image
+                              : equippedThorWarrior.image
+                        }
+                        alt={
+                          gameMode === 'CPU' &&
+                          randomRival &&
+                          pieceArmy === computerArmy &&
+                          randomEnemyWarrior
+                            ? randomEnemyWarrior.name
+                            : pieceArmy === ZEUS
+                              ? equippedZeusWarrior.name
+                              : equippedThorWarrior.name
+                        }
                     />
                   </>
                 )}
@@ -1416,6 +1632,27 @@ function nextWarrior() {
                       </button>
                     ))}
                   </div>
+
+                  <div className="difficulty-kicker">
+                    ENEMY SELECTION
+                  </div>
+
+                  <div className="difficulty-options">
+                    <button
+                      type="button"
+                      className={`difficulty-option ${randomRival ? 'selected' : ''}`}
+                      onClick={toggleRandomRival}
+                    >
+                      <strong>
+                        🎲 RANDOM RIVAL · {randomRival ? 'ON' : 'OFF'}
+                      </strong>
+
+                      <span>
+                        Fight a random unlocked enemy each battle
+                      </span>
+                    </button>
+                  </div>
+
                 </>
               )}
             </div>
@@ -1509,7 +1746,7 @@ function nextWarrior() {
 
               {!previewUnlocked ? (
                 <div className="warrior-modal-requirement">
-                  <strong>🔒 REQUIRES {previewWarrior.unlockAt} WINS</strong>
+                  <strong>🔒 REQUIRES {previewWarrior.unlockAt} WINS AGAINST THIS PANTHEON</strong>
                   <span>{currentWins} / {previewWarrior.unlockAt}</span>
                   <div className="warrior-modal-progress">
                     <div
@@ -1560,31 +1797,26 @@ function nextWarrior() {
                     : 'Neither side claims victory.'}
               </p>
 
-              {unlockNotice && (() => {
-                const unlockedWarrior =
-                  (unlockNotice.army === ZEUS ? ZEUS_WARRIORS : THOR_WARRIORS)[unlockNotice.slot];
-
-                return unlockedWarrior ? (
-                  <div className={`unlock-notice ${unlockNotice.army === ZEUS ? 'zeus' : 'thor'}`}>
-                    <div className="unlock-icon">🔓</div>
-                    <strong>NEW WARRIOR UNLOCKED</strong>
-                    <img
-                      className="unlock-warrior-image"
-                      src={unlockedWarrior.image}
-                      alt={unlockedWarrior.name}
-                    />
-                    <div className="unlock-warrior-name">{unlockedWarrior.name}</div>
-                    <span>{unlockNotice.wins} WINS</span>
-                    <button
-                      type="button"
-                      className="view-unlocked-warrior"
-                      onClick={viewUnlockedWarrior}
-                    >
-                      VIEW WARRIOR ›
-                    </button>
-                  </div>
-                ) : null;
-              })()}
+              {unlockNotice && unlockedWarrior ? (
+                <div className={`unlock-notice ${unlockNotice.army === ZEUS ? 'zeus' : 'thor'}`}>
+                  <div className="unlock-icon">🔓</div>
+                  <strong>NEW WARRIOR UNLOCKED</strong>
+                  <img
+                    className="unlock-warrior-image"
+                    src={unlockedWarrior.image}
+                    alt={unlockedWarrior.name}
+                  />
+                  <div className="unlock-warrior-name">{unlockedWarrior.name}</div>
+                  <span>{unlockNotice.wins} WINS</span>
+                  <button
+                    type="button"
+                    className="view-unlocked-warrior"
+                    onClick={viewUnlockedWarrior}
+                  >
+                    VIEW WARRIOR ›
+                  </button>
+                </div>
+              ) : null}
 
               <button className="new-battle" onClick={startNewBattle}>NEW BATTLE</button>
             </div>
