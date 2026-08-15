@@ -460,6 +460,12 @@ function App() {
   const [randomRival, setRandomRival] = useState<boolean>(() => loadRandomRivalPreference());
   const [randomEnemyWarrior, setRandomEnemyWarrior] = useState<Warrior | null>(null);
 
+  // Shuffle Bag: recorremos todos los rivales desbloqueados antes de
+  // volver a barajar. Así evitamos patrones tipo Freya → Loki → Freya → Loki.
+  const randomEnemyBagRef = useRef<string[]>([]);
+  const randomEnemyPoolSignatureRef = useRef('');
+  const lastRandomEnemyIdRef = useRef<string | null>(null);
+
   const ambienceRef = useRef<HTMLAudioElement | null>(null);
   const [musicStarted, setMusicStarted] = useState(false);
   const [soundMuted, setSoundMuted] = useState(false);
@@ -1005,42 +1011,95 @@ function nextWarrior() {
   }
 
   function chooseRandomEnemy(force = false) {
-  if (gameMode !== 'CPU' || (!randomRival && !force)) {
-    setRandomEnemyWarrior(null);
-    return;
+    if (gameMode !== 'CPU' || (!randomRival && !force)) {
+      setRandomEnemyWarrior(null);
+      return;
+    }
+
+    const warriors =
+      computerArmy === ZEUS
+        ? ZEUS_WARRIORS
+        : THOR_WARRIORS;
+
+    const wins =
+      computerArmy === ZEUS
+        ? zeusTotalWins
+        : thorTotalWins;
+
+    const unlockedWarriors = warriors.filter(
+      warrior => wins >= warrior.unlockAt
+    );
+
+    if (unlockedWarriors.length === 0) {
+      randomEnemyBagRef.current = [];
+      randomEnemyPoolSignatureRef.current = '';
+      lastRandomEnemyIdRef.current = null;
+      setRandomEnemyWarrior(null);
+      return;
+    }
+
+    const poolSignature = unlockedWarriors
+      .map(warrior => warrior.id)
+      .sort()
+      .join('|');
+
+    // Fisher-Yates. Si empieza una ronda nueva, evitamos que el último
+    // rival de la ronda anterior vuelva a ser el primero.
+    const buildShuffledBag = () => {
+      const ids = unlockedWarriors.map(warrior => warrior.id);
+
+      for (let i = ids.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [ids[i], ids[j]] = [ids[j], ids[i]];
+      }
+
+      if (
+        ids.length > 1 &&
+        lastRandomEnemyIdRef.current &&
+        ids[0] === lastRandomEnemyIdRef.current
+      ) {
+        const swapIndex = ids.findIndex(
+          id => id !== lastRandomEnemyIdRef.current
+        );
+
+        if (swapIndex > 0) {
+          [ids[0], ids[swapIndex]] = [ids[swapIndex], ids[0]];
+        }
+      }
+
+      return ids;
+    };
+
+    // Si cambió el roster desbloqueado (por ejemplo acabas de desbloquear
+    // Frost Giant), reconstruimos la bolsa para incluirlo inmediatamente.
+    if (
+      randomEnemyPoolSignatureRef.current !== poolSignature ||
+      randomEnemyBagRef.current.length === 0
+    ) {
+      randomEnemyPoolSignatureRef.current = poolSignature;
+      randomEnemyBagRef.current = buildShuffledBag();
+    }
+
+    const nextEnemyId = randomEnemyBagRef.current.shift();
+
+    if (!nextEnemyId) {
+      setRandomEnemyWarrior(null);
+      return;
+    }
+
+    const nextEnemy = unlockedWarriors.find(
+      warrior => warrior.id === nextEnemyId
+    );
+
+    if (!nextEnemy) {
+      randomEnemyBagRef.current = [];
+      chooseRandomEnemy(force);
+      return;
+    }
+
+    lastRandomEnemyIdRef.current = nextEnemy.id;
+    setRandomEnemyWarrior(nextEnemy);
   }
-
-  const warriors =
-    computerArmy === ZEUS
-      ? ZEUS_WARRIORS
-      : THOR_WARRIORS;
-
-  const wins =
-    computerArmy === ZEUS
-      ? zeusTotalWins
-      : thorTotalWins;
-
-  const unlockedWarriors = warriors.filter(
-    warrior => wins >= warrior.unlockAt
-  );
-
-  if (unlockedWarriors.length === 0) {
-    setRandomEnemyWarrior(null);
-    return;
-  }
-
-  const candidates =
-    unlockedWarriors.length > 1 && randomEnemyWarrior
-      ? unlockedWarriors.filter(
-          warrior => warrior.id !== randomEnemyWarrior.id
-        )
-      : unlockedWarriors;
-
-  const randomWarrior =
-    candidates[Math.floor(Math.random() * candidates.length)];
-
-  setRandomEnemyWarrior(randomWarrior);
-}
 
   function toggleRandomRival() {
     if (gameMode !== 'CPU' || battleStarted) return;
@@ -1101,6 +1160,7 @@ function nextWarrior() {
     }
 
     if (nextRandom) {
+      randomEnemyBagRef.current = [];
       chooseRandomEnemy(true);
     } else {
       setRandomEnemyWarrior(null);
