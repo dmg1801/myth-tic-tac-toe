@@ -887,15 +887,29 @@ function nextWarrior() {
 
   const winnerArmy = winner ? armyForMark(winner) : null;
 
+  const humanWarrior =
+  humanArmy === ZEUS
+    ? equippedZeusWarrior
+    : equippedThorWarrior;
+
+  const enemyWarrior =
+    computerArmy === ZEUS
+      ? equippedZeusWarrior
+      : equippedThorWarrior;
+
   const status = winnerArmy
-    ? winnerArmy === ZEUS ? 'Zeus Victory' : 'Thor Victory'
+    ? winnerArmy === ZEUS
+      ? 'Zeus Victory'
+      : 'Thor Victory'
     : draw
       ? 'DRAW'
       : !battleStarted
-        ? humanMark === 'X' ? 'Choose your side · You play first' : 'Choose your side · You play second'
+        ? humanMark === 'X'
+          ? 'Choose your side · You play first'
+          : 'Choose your side · You play second'
         : thinking
-          ? computerArmy === ZEUS ? 'Zeus is thinking…' : 'Thor is thinking…'
-          : 'Your turn';
+          ? `Enemy turn · ${enemyWarrior.name}`
+          : `Your turn · ${humanWarrior.name}`;
 
   const resultTitle = winner
     ? winner === humanMark
@@ -956,7 +970,23 @@ function nextWarrior() {
         </h1>
 
         <div className={`scene-status ${thinking ? 'thinking' : ''}`}>
-          {status}
+          {battleStarted && !gameOver ? (
+            <>
+              <img
+                className={`status-warrior-image ${
+                  !thinking ? 'status-warrior-human' : ''
+                }`}
+                src={thinking ? enemyWarrior.image : humanWarrior.image}
+                alt=""
+              />
+
+              <span className="status-warrior-text">
+                {status}
+              </span>
+            </>
+          ) : (
+            status
+          )}
         </div>
 
         <div className={`player-selector ${battleStarted ? 'locked' : ''}`}>
