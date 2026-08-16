@@ -962,6 +962,58 @@ function nextWarrior() {
   playSound(previewWarrior.sound, AUDIO_VOLUME.warriorPreview);
 }
 
+  function playAsPreviewSide() {
+    if (
+      battleStarted ||
+      gameMode !== 'CPU' ||
+      !previewUnlocked ||
+      selectorArmy === humanArmy
+    ) {
+      return;
+    }
+
+    // Equipamos el guerrero que el jugador está viendo.
+    if (selectorArmy === ZEUS) {
+      setSelectedZeusWarrior(warriorPreviewIndex);
+    } else {
+      setSelectedThorWarrior(warriorPreviewIndex);
+    }
+
+    // Conservamos la selección para futuras sesiones.
+    try {
+      const saved = localStorage.getItem(WARRIOR_SELECTION_STORAGE_KEY);
+
+      const currentSelection = saved
+        ? JSON.parse(saved)
+        : {
+            zeus: ZEUS_WARRIORS[0].id,
+            thor: THOR_WARRIORS[0].id,
+          };
+
+      localStorage.setItem(
+        WARRIOR_SELECTION_STORAGE_KEY,
+        JSON.stringify({
+          ...currentSelection,
+          [selectorArmy === ZEUS ? 'zeus' : 'thor']: previewWarrior.id,
+        })
+      );
+    } catch {
+      // Si localStorage falla, el cambio sigue funcionando en esta sesión.
+    }
+
+    acknowledgeWarrior(selectorArmy, warriorPreviewIndex);
+
+    // El panteón que estamos viendo pasa a ser el bando del jugador.
+    // RANDOM RIVAL conserva su preferencia; el useEffect existente
+    // preparará automáticamente un rival del panteón contrario.
+    randomEnemyBagRef.current = [];
+    setRandomEnemyWarrior(null);
+    setHumanArmy(selectorArmy);
+
+    playSound(previewWarrior.sound, AUDIO_VOLUME.selection);
+    setShowWarriorSelector(false);
+  }
+
   function openWarriorSelector(army: Army) {
     if (battleStarted) return;
 
@@ -1419,6 +1471,28 @@ const displayedThorWarrior =
           <div className="battle-warriors-vs">VS</div>
 
           {gameMode === 'CPU' && (
+            <div
+              className={`current-side-quick ${
+                humanArmy === ZEUS ? 'on-zeus zeus' : 'on-thor thor'
+              }`}
+              aria-label={
+                humanArmy === ZEUS
+                  ? 'You are playing as Greeks'
+                  : 'You are playing as Norse'
+              }
+              title={
+                humanArmy === ZEUS
+                  ? 'Your side: Greeks'
+                  : 'Your side: Norse'
+              }
+            >
+              <span className="current-side-quick-icon">
+                {humanArmy === ZEUS ? '⚡' : '🔨'}
+              </span>
+            </div>
+          )}
+
+          {gameMode === 'CPU' && (
             <button
               type="button"
               className={`random-rival-quick ${
@@ -1823,6 +1897,30 @@ const displayedThorWarrior =
                 <div className="warrior-modal-hint equipped">READY FOR BATTLE</div>
               ) : (
                 <div className="warrior-modal-hint">TAP THE WARRIOR TO EQUIP</div>
+              )}
+
+              {gameMode === 'CPU' && previewUnlocked && (
+                selectorArmy === humanArmy ? (
+                  <div
+                    className={`warrior-side-status ${
+                      selectorArmy === ZEUS ? 'zeus' : 'thor'
+                    }`}
+                  >
+                    ✓ YOUR CURRENT SIDE
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className={`warrior-play-side-button ${
+                      selectorArmy === ZEUS ? 'zeus' : 'thor'
+                    }`}
+                    onClick={playAsPreviewSide}
+                  >
+                    {selectorArmy === ZEUS
+                      ? '⚡ PLAY AS GREEKS'
+                      : 'PLAY AS NORSE 🔨'}
+                  </button>
+                )
               )}
 
               <div className="warrior-modal-footer">
