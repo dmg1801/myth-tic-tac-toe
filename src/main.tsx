@@ -428,6 +428,7 @@ const [selectedThorWarrior, setSelectedThorWarrior] = useState(() =>
   };
 
   const [showCodex, setShowCodex] = useState(false);
+  const [showMuseumMenu, setShowMuseumMenu] = useState(false);
   const [codexArmy, setCodexArmy] = useState<Army>(ZEUS);
   const [selectedLoreWarriorId, setSelectedLoreWarriorId] = useState<string | null>(null);
   const [codexReturnToRoster, setCodexReturnToRoster] = useState(false);
@@ -956,6 +957,7 @@ function nextWarrior() {
     setSelectedLoreWarriorId(null);
     setCodexReturnToRoster(false);
     setShowDifficulty(false);
+    setShowMuseumMenu(false);
     setShowCodex(true);
     playSound(pageSound, AUDIO_VOLUME.page);
   }
@@ -1546,6 +1548,20 @@ const displayedThorWarrior =
           {thorScore}
         </div>
 
+        <button
+          type="button"
+          className={`museum-quick-button ${battleStarted ? 'hidden' : ''}`}
+          onClick={() => setShowMuseumMenu(true)}
+          disabled={battleStarted}
+          aria-label={language === 'ES' ? 'Abrir museo' : 'Open museum'}
+          title={language === 'ES' ? 'Historia y arqueología' : 'History & archaeology'}
+         >
+          <span className="museum-quick-icon">🏛️</span>
+          <span>
+            {language === 'ES' ? 'MUSEO' : 'MUSEUM'}
+          </span>
+        </button>
+
         <div className={`board-hitbox ${thinking ? 'locked' : ''}`}>
           {board.map((value, index) => {
             const pieceArmy = value ? armyForMark(value) : null;
@@ -1553,11 +1569,14 @@ const displayedThorWarrior =
             return (
               <button
                 className={`cell ${
-                  boardIntro
+                  boardIntro &&
+                  !showCodex &&
+                  !showMuseumMenu &&
+                  !showDifficulty &&
+                  !showWarriorSelector &&
+                  !showGodModeLogin
                     ? 'cell-intro'
-                    : value === null && !gameOver
-                      ? 'cell-empty'
-                      : ''
+                    : ''
                 }`}
                 key={index}
                 onClick={() => play(index)}
@@ -1784,20 +1803,47 @@ const displayedThorWarrior =
                 </>
               )}
 
-              <div className="battle-mode-mythology">
-                <div className="difficulty-kicker">
-                  {t.historyMythology}
-                </div>
-                <div className="difficulty-options">
-                  <button type="button" className="difficulty-option mythology greek" onClick={() => openCodex(ZEUS)}>
-                    <strong>⚡ {t.greekMythology}</strong>
-                    <span>{t.explorePantheon}</span>
-                  </button>
-                  <button type="button" className="difficulty-option mythology norse" onClick={() => openCodex(THOR)}>
-                    <strong>{t.norseMythology} 🔨</strong>
-                    <span>{t.explorePantheon}</span>
-                  </button>
-                </div>
+            </div>
+          </div>
+        )}
+
+        {showMuseumMenu && (
+          <div
+            className="museum-menu-backdrop"
+            onClick={() => setShowMuseumMenu(false)}
+          >
+            <div
+              className="museum-menu"
+              role="dialog"
+              aria-modal="true"
+              aria-label={language === 'ES' ? 'Museo' : 'Museum'}
+              onClick={(event) => event.stopPropagation()}
+            >
+              <button
+                type="button"
+                className="museum-menu-close"
+                onClick={() => setShowMuseumMenu(false)}
+                aria-label={t.close}
+              >
+                ×
+              </button>
+
+              <div className="museum-menu-icon">🏛️</div>
+              <div className="museum-menu-kicker">
+                {language === 'ES' ? 'HISTORIA Y ARQUEOLOGÍA' : 'HISTORY & ARCHAEOLOGY'}
+              </div>
+              <h2>{language === 'ES' ? 'MUSEO' : 'MUSEUM'}</h2>
+
+              <div className="museum-menu-options">
+                <button type="button" className="museum-pantheon greek" onClick={() => openCodex(ZEUS)}>
+                  <strong>⚡ {t.greekPantheon}</strong>
+                  <span>{t.explorePantheon}</span>
+                </button>
+
+                <button type="button" className="museum-pantheon norse" onClick={() => openCodex(THOR)}>
+                  <strong>{t.norsePantheon} 🔨</strong>
+                  <span>{t.explorePantheon}</span>
+                </button>
               </div>
             </div>
           </div>
