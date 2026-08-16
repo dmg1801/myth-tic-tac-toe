@@ -128,32 +128,35 @@ const WARRIOR_I18N: Record<string, {
   ])
 );
 
-const LORE_ENTRIES: Partial<Record<string, LoreEntry>> = {
-  zeus: {
-    title: { EN: loreEntriesEN.zeus.title, ES: loreEntriesES.zeus.title },
-    subtitle: { EN: loreEntriesEN.zeus.subtitle, ES: loreEntriesES.zeus.subtitle },
-    mythology: {
-      EN: loreEntriesEN.zeus.mythology,
-      ES: loreEntriesES.zeus.mythology,
-    },
-    archaeology: {
-      EN: loreEntriesEN.zeus.archaeology,
-      ES: loreEntriesES.zeus.archaeology,
-    },
-  },
-  thor: {
-    title: { EN: loreEntriesEN.thor.title, ES: loreEntriesES.thor.title },
-    subtitle: { EN: loreEntriesEN.thor.subtitle, ES: loreEntriesES.thor.subtitle },
-    mythology: {
-      EN: loreEntriesEN.thor.mythology,
-      ES: loreEntriesES.thor.mythology,
-    },
-    archaeology: {
-      EN: loreEntriesEN.thor.archaeology,
-      ES: loreEntriesES.thor.archaeology,
-    },
-  },
-};
+const LORE_ENTRIES: Partial<Record<string, LoreEntry>> = Object.fromEntries(
+  Array.from(new Set([...Object.keys(loreEntriesEN), ...Object.keys(loreEntriesES)])).map((key) => {
+    const enEntry = loreEntriesEN[key];
+    const esEntry = loreEntriesES[key];
+
+    return [
+      key,
+      {
+        title: {
+          EN: enEntry?.title ?? esEntry?.title ?? key.toUpperCase(),
+          ES: esEntry?.title ?? enEntry?.title ?? key.toUpperCase(),
+        },
+        subtitle: {
+          EN: enEntry?.subtitle ?? esEntry?.subtitle ?? '',
+          ES: esEntry?.subtitle ?? enEntry?.subtitle ?? '',
+        },
+        mythology: {
+          EN: enEntry?.mythology ?? '',
+          ES: esEntry?.mythology ?? '',
+        },
+        archaeology: {
+          EN: enEntry?.archaeology ?? '',
+          ES: esEntry?.archaeology ?? '',
+        },
+        archaeologicalImage: enEntry?.archaeologicalImage ?? esEntry?.archaeologicalImage,
+      },
+    ];
+  })
+);
 
 
 type GloryProgress = {
