@@ -1883,7 +1883,7 @@ const displayedThorWarrior =
           </div>
         )}
         <div className="game-signature">
-          ZEUS vs THOR · v3.0.0 · a game by @dmongayg
+          ZEUS vs THOR · v4.0.0 · a game by Diego Mongay
         </div>
       </section>
     </main>
