@@ -53,6 +53,15 @@ import drawSound from './assets/sounds/draw.mp3';
 import ambienceSound from './assets/sounds/ambience.mp3';
 
 import pageSound from './assets/sounds/page.mp3';
+import { loreEntriesEN } from './data/lore/en';
+import { loreEntriesES } from './data/lore/es';
+import { uiTextEN } from './data/ui/en';
+import { uiTextES } from './data/ui/es';
+import { warriorI18nEN } from './data/warriors/en';
+import { warriorI18nES } from './data/warriors/es';
+import { THOR_WARRIORS } from './data/warriors/thor';
+import { ZEUS_WARRIORS } from './data/warriors/zeus';
+import type { Warrior } from './data/warriors/types';
 
 type Player = 'X' | 'O';
 type Cell = Player | null;
@@ -88,522 +97,60 @@ type LoreEntry = {
 };
 
 const UI_TEXT = {
-  EN: {
-    yourTurn: 'YOUR TURN',
-    thinking: 'IS THINKING…',
-    chooseSideFirst: 'CHOOSE YOUR SIDE · YOU PLAY FIRST',
-    chooseSideSecond: 'CHOOSE YOUR SIDE · YOU PLAY SECOND',
-    draw: 'DRAW',
-    victory: 'VICTORY',
-    battleMode: 'BATTLE MODE',
-    chooseMode: 'CHOOSE GAME MODE',
-    onePlayer: '1 PLAYER',
-    twoPlayers: '2 PLAYERS',
-    vsGods: 'VS THE GODS',
-    localBattle: 'LOCAL BATTLE',
-    difficulty: 'DIFFICULTY',
-    easy: 'EASY',
-    medium: 'MEDIUM',
-    hard: 'HARD',
-    randomRival: 'RANDOM RIVAL',
-    randomOn: 'RANDOM ON',
-    selected: 'SELECTED',
-    randomDesc: 'Face a different unlocked rival each battle',
-    selectedDesc: 'Fight the rival you selected',
-    historyMythology: 'HISTORY & MYTHOLOGY',
-    greekMythology: 'GREEK MYTHOLOGY',
-    norseMythology: 'NORSE MYTHOLOGY',
-    explorePantheon: 'Explore the pantheon and its historical context',
-    change: 'CHANGE',
-    warriors: 'WARRIORS',
-    glory: 'GLORY',
-    greeks: 'GREEKS',
-    norse: 'NORSE',
-    currentSide: 'YOUR CURRENT SIDE',
-    playAsGreeks: '⚡ PLAY AS GREEKS',
-    playAsNorse: 'PLAY AS NORSE 🔨',
-    readyBattle: 'READY FOR BATTLE',
-    tapEquip: 'TAP THE WARRIOR TO EQUIP',
-    requires: 'REQUIRES',
-    winsAgainst: 'WINS AGAINST THIS PANTHEON',
-    resetProgress: '↺ RESET PROGRESS',
-    back: 'BACK',
-    greekPantheon: 'GREEK PANTHEON',
-    norsePantheon: 'NORSE PANTHEON',
-    playUnlockDiscover: 'PLAY · UNLOCK · DISCOVER',
-    viewHistory: 'VIEW HISTORY & CONTEXT',
-    locked: 'LOCKED',
-    gameArt: 'GAME ART',
-    archaeology: 'ARCHAEOLOGY',
-    archaeologicalObject: 'ARCHAEOLOGICAL OBJECT',
-    comingSoon: 'COMING SOON',
-    mythologyHistory: 'MYTHOLOGY & HISTORY',
-    archaeologicalContext: 'ARCHAEOLOGICAL CONTEXT',
-    newBattle: 'NEW BATTLE',
-    newWarrior: 'NEW WARRIOR UNLOCKED',
-    viewWarrior: 'VIEW WARRIOR ›',
-    wins: 'WINS',
-    yourWarriorsWin: 'Your warriors dominate the field.',
-    enemyWins: 'The enemy has broken your lines.',
-    neitherWins: 'Neither side claims victory.',
-    zeusVictory: 'ZEUS VICTORY',
-    thorVictory: 'THOR VICTORY',
-    mute: 'MUTE',
-    sound: 'SOUND',
-  },
-  ES: {
-    yourTurn: 'TU TURNO',
-    thinking: 'ESTÁ PENSANDO…',
-    chooseSideFirst: 'ELIGE TU BANDO · JUEGAS PRIMERO',
-    chooseSideSecond: 'ELIGE TU BANDO · JUEGAS SEGUNDO',
-    draw: 'EMPATE',
-    victory: 'VICTORIA',
-    battleMode: 'MODO DE BATALLA',
-    chooseMode: 'ELIGE MODO DE JUEGO',
-    onePlayer: '1 JUGADOR',
-    twoPlayers: '2 JUGADORES',
-    vsGods: 'CONTRA LOS DIOSES',
-    localBattle: 'BATALLA LOCAL',
-    difficulty: 'DIFICULTAD',
-    easy: 'FÁCIL',
-    medium: 'MEDIO',
-    hard: 'DIFÍCIL',
-    randomRival: 'RIVAL ALEATORIO',
-    randomOn: 'ALEATORIO',
-    selected: 'SELECCIONADO',
-    randomDesc: 'Enfréntate a un rival desbloqueado diferente en cada batalla',
-    selectedDesc: 'Combate contra el rival que seleccionaste',
-    historyMythology: 'HISTORIA Y MITOLOGÍA',
-    greekMythology: 'MITOLOGÍA GRIEGA',
-    norseMythology: 'MITOLOGÍA NÓRDICA',
-    explorePantheon: 'Explora el panteón y su contexto histórico',
-    change: 'CAMBIAR',
-    warriors: 'GUERREROS',
-    glory: 'GLORIA',
-    greeks: 'GRIEGOS',
-    norse: 'NÓRDICOS',
-    currentSide: 'TU BANDO ACTUAL',
-    playAsGreeks: '⚡ JUGAR COMO GRIEGOS',
-    playAsNorse: 'JUGAR COMO NÓRDICOS 🔨',
-    readyBattle: 'LISTO PARA LA BATALLA',
-    tapEquip: 'TOCA EL GUERRERO PARA EQUIPARLO',
-    requires: 'REQUIERE',
-    winsAgainst: 'VICTORIAS CONTRA ESTE PANTEÓN',
-    resetProgress: '↺ REINICIAR PROGRESO',
-    back: 'VOLVER',
-    greekPantheon: 'PANTEÓN GRIEGO',
-    norsePantheon: 'PANTEÓN NÓRDICO',
-    playUnlockDiscover: 'JUEGA · DESBLOQUEA · DESCUBRE',
-    viewHistory: 'VER HISTORIA Y CONTEXTO',
-    locked: 'BLOQUEADO',
-    gameArt: 'ARTE DEL JUEGO',
-    archaeology: 'ARQUEOLOGÍA',
-    archaeologicalObject: 'PIEZA ARQUEOLÓGICA',
-    comingSoon: 'PRÓXIMAMENTE',
-    mythologyHistory: 'MITOLOGÍA E HISTORIA',
-    archaeologicalContext: 'CONTEXTO ARQUEOLÓGICO',
-    newBattle: 'NUEVA BATALLA',
-    newWarrior: 'NUEVO GUERRERO DESBLOQUEADO',
-    viewWarrior: 'VER GUERRERO ›',
-    wins: 'VICTORIAS',
-    yourWarriorsWin: 'Tus guerreros dominan el campo de batalla.',
-    enemyWins: 'El enemigo ha roto tus líneas.',
-    neitherWins: 'Ningún bando reclama la victoria.',
-    zeusVictory: 'VICTORIA DE ZEUS',
-    thorVictory: 'VICTORIA DE THOR',
-    mute: 'SILENCIAR',
-    sound: 'SONIDO',
-  },
+  EN: uiTextEN,
+  ES: uiTextES,
 } as const;
 
 
 
-type Warrior = {
-  id: string;
-  name: string;
-  title: string;
-  description: string;
-  unlockAt: number;
-  image: string;
-  sound: string;
-};
-
-const ZEUS_WARRIORS: Warrior[] = [
-  {
-    id: 'hoplite',
-    name: 'HOPLITE',
-    title: 'WARRIOR OF ANCIENT GREECE',
-    description: 'Hoplites were heavily armed Greek infantrymen who fought in close formation, protected by large shields and armed with spears.',
-    unlockAt: 0,
-    image: player1Image,
-    sound: hopliteSound,
-  },
-  {
-    id: 'athena',
-    name: 'ATHENA',
-    title: 'GODDESS OF WISDOM',
-    description: 'Daughter of Zeus and patron goddess of Athens. Athena embodied wisdom, strategy and disciplined warfare.',
-    unlockAt: 1,
-    image: athenaImage,
-    sound: athenaSound,
-  },
-  {
-    id: 'minotaur',
-    name: 'MINOTAUR',
-    title: 'BEAST OF THE LABYRINTH',
-    description: 'A mythical creature with the body of a man and the head of a bull, confined within the Labyrinth of Crete.',
-    unlockAt: 3,
-    image: minotaurImage,
-    sound: minotaurSound,
-  },
-   {
-    id: 'aphrodite',
-    name: 'APRODITE',
-    title: 'GODDESS OF LOVE AND BEAUTY',
-    description: 'Goddess of love, beauty, pleasure, and procreation. Aphrodite was born from the sea foam and is associated with the dove and the rose.',
-    unlockAt: 5,
-    image: aphroditeImage,
-    sound: aphroditeSound,
-  },
-  {
-    id: 'hades',
-    name: 'HADES',
-    title: 'LORD OF THE UNDERWORLD',
-    description: 'Brother of Zeus and Poseidon. After the gods divided the cosmos, Hades became ruler of the Underworld and the realm of the dead.',
-    unlockAt: 7,
-    image: hadesImage,
-    sound: hadesSound,
-  },
-  {
-    id: 'Demeter',
-    name: 'DEMETER',
-    title: 'GODDESS OF THE EARTH',
-    description: 'Goddess of the harvest, agriculture, and the seasons. Demeter is associated with the cycle of life and death.',
-    unlockAt: 10,
-    image: demeterImage,
-    sound: demeterSound,
-  },
-  {
-    id: 'Poseidon',
-    name: 'POSEIDON',
-    title: 'GOD OF THE SEA',
-    description: 'Brother of Zeus and Hades. Poseidon is the god of the sea, earthquakes, and horses.',
-    unlockAt: 12,
-    image: poseidonImage,
-    sound: poseidonSound,
-  },
-   {
-    id: 'hesta',
-    name: 'HESTA',
-    title: 'GODDESS OF THE HOME',
-    description: 'Goddess of the hearth, home, and family. Hesta is associated with the sacred fire and the domestic sphere.',
-    unlockAt: 14,
-    image: hestaImage,
-    sound: hestaSound,
-  },
-   {
-    id: 'hermes',
-    name: 'HERMES',
-    title: 'GOD OF MESSAGING',
-    description: 'God of travel, communication, and thieves. Hermes is known for his speed and cunning.',
-    unlockAt: 16,
-    image: hermesImage,
-    sound: hermesSound,
-  },
-  {
-    id: 'zeus',
-    name: 'ZEUS',
-    title: 'KING OF THE GODS',
-    description: 'Ruler of the Olympian gods and master of thunder and lightning. Zeus overthrew the Titans and ruled from Mount Olympus.',
-    unlockAt: 20,
-    image: zeusImage,
-    sound: zeusSound,
-  },
-];
-
-const THOR_WARRIORS: Warrior[] = [
-  {
-    id: 'ulfsark',
-    name: 'ULFSARK',
-    title: 'WOLF WARRIOR',
-    description: 'The úlfhéðnar appear in Old Norse tradition as warriors associated with wolves and Odin, often compared with berserkers.',
-    unlockAt: 0,
-    image: player2Image,
-    sound: ulfsarkSound,
-  },
-  {
-    id: 'freya',
-    name: 'FREYJA',
-    title: 'GODDESS OF LOVE AND WAR',
-    description: 'A powerful Norse goddess associated with love, fertility, magic and battle. Freyja receives half of those who fall in combat.',
-    unlockAt: 1,
-    image: freyaImage,
-    sound: freyaSound,
-  },
-  {
-    id: 'frost-giant',
-    name: 'FROST GIANT',
-    title: 'JÖTUNN OF THE NORTH',
-    description: 'The jötnar are powerful beings of Norse mythology, frequently opposed to the gods and tied to the wild forces of the cosmos.',
-    unlockAt: 3,
-    image: frostGiantImage,
-    sound: frostGiantSound,
-  },
-  {
-    id: 'hela',
-    name: 'HEL',
-    title: 'RULER OF THE DEAD',
-    description: 'Daughter of Loki and ruler of the realm also called Hel. She receives many of those who die from sickness or old age.',
-    unlockAt: 5,
-    image: helaImage,
-    sound: helSound,
-  },
-  {
-    id: 'loki',
-    name: 'LOKI',
-    title: 'GOD OF MESSAGING AND TRICKERY',
-    description: 'Trickster god associated with chaos, cunning, and magic. Loki is known for his shape-shifting abilities and his complex relationship with the other gods.',
-    unlockAt: 7,
-    image: lokiImage,
-    sound: lokiSound,
-  },
-  {
-    id: 'skadi',
-    name: 'SKADI',
-    title: 'GODDESS OF HUNT AND WINTER',
-    description: 'A powerful Norse goddess associated with hunting, winter, and the mountains. Skadi is known for her strength and her role in the myth of the gods.',
-    unlockAt: 10,
-    image: skadiImage,
-    sound: skadiSound,
-  },
-   {
-    id: 'odin',
-    name: 'ODIN',
-    title: 'WISDOM AND MAGIC',
-    description: 'The chief of the Aesir gods and the ruler of Asgard. Odin is associated with wisdom, war, and death.',
-    unlockAt: 12,
-    image: odinImage,
-    sound: odinSound,
-  },
-   {
-    id: 'valkyrie',
-    name: 'VALKYRIE',
-    title: 'CHOOSER OF THE SLAIN',
-    description: 'Female figures in Norse mythology who decide which warriors die in battle and are brought to Valhalla.',
-    unlockAt: 14,
-    image: valkyrieImage,
-    sound: valkyrieSound,
-  },
-   {
-    id: 'forseti',
-    name: 'FORSETI',
-    title: 'GOD OF TRUTH AND JUSTICE',
-    description: 'The god of truth and justice in Norse mythology. Forseti is known for his fairness and his role in mediating disputes.',
-    unlockAt: 16,
-    image: forsetiImage,
-    sound: forsetiSound,
-  },
-  {
-    id: 'thor',
-    name: 'THOR',
-    title: 'GOD OF THUNDER',
-    description: 'Son of Odin and one of the mightiest Norse gods. Thor protects gods and humans and wields the famous hammer Mjölnir.',
-    unlockAt: 20,
-    image: thorImage,
-    sound: thorSound,
-  },
-];
 
 const WARRIOR_I18N: Record<string, {
   name: { EN: string; ES: string };
   title: { EN: string; ES: string };
   description: { EN: string; ES: string };
-}> = {
-  hoplite: {
-    name: { EN: 'HOPLITE', ES: 'HOPLITA' },
-    title: { EN: 'WARRIOR OF ANCIENT GREECE', ES: 'GUERRERO DE LA ANTIGUA GRECIA' },
-    description: {
-      EN: 'Hoplites were heavily armed Greek infantrymen who fought in close formation, protected by large shields and armed with spears.',
-      ES: 'Los hoplitas eran infantes griegos fuertemente armados que combatían en formación cerrada, protegidos por grandes escudos y armados con lanzas.',
+}> = Object.fromEntries(
+  Array.from(new Set([...Object.keys(warriorI18nEN), ...Object.keys(warriorI18nES)])).map((key) => [
+    key,
+    {
+      name: {
+        EN: warriorI18nEN[key]?.name ?? warriorI18nES[key].name,
+        ES: warriorI18nES[key]?.name ?? warriorI18nEN[key].name,
+      },
+      title: {
+        EN: warriorI18nEN[key]?.title ?? warriorI18nES[key].title,
+        ES: warriorI18nES[key]?.title ?? warriorI18nEN[key].title,
+      },
+      description: {
+        EN: warriorI18nEN[key]?.description ?? warriorI18nES[key].description,
+        ES: warriorI18nES[key]?.description ?? warriorI18nEN[key].description,
+      },
     },
-  },
-  athena: {
-    name: { EN: 'ATHENA', ES: 'ATENEA' },
-    title: { EN: 'GODDESS OF WISDOM', ES: 'DIOSA DE LA SABIDURÍA' },
-    description: {
-      EN: 'Daughter of Zeus and patron goddess of Athens. Athena embodied wisdom, strategy and disciplined warfare.',
-      ES: 'Hija de Zeus y diosa protectora de Atenas. Atenea encarnaba la sabiduría, la estrategia y la guerra disciplinada.',
-    },
-  },
-  minotaur: {
-    name: { EN: 'MINOTAUR', ES: 'MINOTAURO' },
-    title: { EN: 'BEAST OF THE LABYRINTH', ES: 'BESTIA DEL LABERINTO' },
-    description: {
-      EN: 'A mythical creature with the body of a man and the head of a bull, confined within the Labyrinth of Crete.',
-      ES: 'Criatura mítica con cuerpo de hombre y cabeza de toro, encerrada en el Laberinto de Creta.',
-    },
-  },
-  aphrodite: {
-    name: { EN: 'APHRODITE', ES: 'AFRODITA' },
-    title: { EN: 'GODDESS OF LOVE AND BEAUTY', ES: 'DIOSA DEL AMOR Y LA BELLEZA' },
-    description: {
-      EN: 'Goddess of love, beauty, pleasure, and procreation. Aphrodite was born from the sea foam and is associated with the dove and the rose.',
-      ES: 'Diosa del amor, la belleza, el placer y la procreación. Afrodita nació de la espuma del mar y está asociada con la paloma y la rosa.',
-    },
-  },
-  hades: {
-    name: { EN: 'HADES', ES: 'HADES' },
-    title: { EN: 'LORD OF THE UNDERWORLD', ES: 'SEÑOR DEL INFRAMUNDO' },
-    description: {
-      EN: 'Brother of Zeus and Poseidon. After the gods divided the cosmos, Hades became ruler of the Underworld and the realm of the dead.',
-      ES: 'Hermano de Zeus y Poseidón. Tras repartirse los dioses el cosmos, Hades se convirtió en soberano del Inframundo y del reino de los muertos.',
-    },
-  },
-  Demeter: {
-    name: { EN: 'DEMETER', ES: 'DEMÉTER' },
-    title: { EN: 'GODDESS OF THE EARTH', ES: 'DIOSA DE LA TIERRA' },
-    description: {
-      EN: 'Goddess of the harvest, agriculture, and the seasons. Demeter is associated with the cycle of life and death.',
-      ES: 'Diosa de la cosecha, la agricultura y las estaciones. Deméter está asociada con el ciclo de la vida y la muerte.',
-    },
-  },
-  Poseidon: {
-    name: { EN: 'POSEIDON', ES: 'POSEIDÓN' },
-    title: { EN: 'GOD OF THE SEA', ES: 'DIOS DEL MAR' },
-    description: {
-      EN: 'Brother of Zeus and Hades. Poseidon is the god of the sea, earthquakes, and horses.',
-      ES: 'Hermano de Zeus y Hades. Poseidón es el dios del mar, los terremotos y los caballos.',
-    },
-  },
-  hesta: {
-    name: { EN: 'HESTIA', ES: 'HESTIA' },
-    title: { EN: 'GODDESS OF THE HEARTH', ES: 'DIOSA DEL HOGAR' },
-    description: {
-      EN: 'Goddess of the hearth, home, and family. Hestia is associated with sacred fire and the domestic sphere.',
-      ES: 'Diosa del hogar, la familia y el fuego del hogar. Hestia está asociada con el fuego sagrado y el ámbito doméstico.',
-    },
-  },
-  hermes: {
-    name: { EN: 'HERMES', ES: 'HERMES' },
-    title: { EN: 'MESSENGER OF THE GODS', ES: 'MENSAJERO DE LOS DIOSES' },
-    description: {
-      EN: 'God associated with travel, communication, trade and thieves. Hermes is known for his speed and cunning.',
-      ES: 'Dios asociado con los viajeros, la comunicación, el comercio y los ladrones. Hermes es conocido por su velocidad y astucia.',
-    },
-  },
-  zeus: {
-    name: { EN: 'ZEUS', ES: 'ZEUS' },
-    title: { EN: 'KING OF THE GODS', ES: 'REY DE LOS DIOSES' },
-    description: {
-      EN: 'Ruler of the Olympian gods and master of thunder and lightning. Zeus overthrew the Titans and ruled from Mount Olympus.',
-      ES: 'Soberano de los dioses olímpicos y señor del trueno y el rayo. Zeus derrotó a los Titanes y gobernó desde el monte Olimpo.',
-    },
-  },
-  ulfsark: {
-    name: { EN: 'ULFSARK', ES: 'ULFSARK' },
-    title: { EN: 'WOLF WARRIOR', ES: 'GUERRERO LOBO' },
-    description: {
-      EN: 'The úlfhéðnar appear in Old Norse tradition as warriors associated with wolves and Odin, often compared with berserkers.',
-      ES: 'Los úlfhéðnar aparecen en la tradición nórdica antigua como guerreros asociados con los lobos y Odín, frecuentemente comparados con los berserkers.',
-    },
-  },
-  freya: {
-    name: { EN: 'FREYJA', ES: 'FREYJA' },
-    title: { EN: 'GODDESS OF LOVE AND WAR', ES: 'DIOSA DEL AMOR Y LA GUERRA' },
-    description: {
-      EN: 'A powerful Norse goddess associated with love, fertility, magic and battle. Freyja receives half of those who fall in combat.',
-      ES: 'Poderosa diosa nórdica asociada con el amor, la fertilidad, la magia y la batalla. Freyja recibe a la mitad de quienes caen en combate.',
-    },
-  },
-  'frost-giant': {
-    name: { EN: 'FROST GIANT', ES: 'GIGANTE DE HIELO' },
-    title: { EN: 'JÖTUNN OF THE NORTH', ES: 'JÖTUNN DEL NORTE' },
-    description: {
-      EN: 'The jötnar are powerful beings of Norse mythology, frequently opposed to the gods and tied to the wild forces of the cosmos.',
-      ES: 'Los jötnar son seres poderosos de la mitología nórdica, frecuentemente enfrentados a los dioses y vinculados con las fuerzas salvajes del cosmos.',
-    },
-  },
-  hela: {
-    name: { EN: 'HEL', ES: 'HEL' },
-    title: { EN: 'RULER OF THE DEAD', ES: 'SOBERANA DE LOS MUERTOS' },
-    description: {
-      EN: 'Daughter of Loki and ruler of the realm also called Hel. She receives many of those who die from sickness or old age.',
-      ES: 'Hija de Loki y soberana del reino también llamado Hel. Recibe a muchos de quienes mueren por enfermedad o vejez.',
-    },
-  },
-  loki: {
-    name: { EN: 'LOKI', ES: 'LOKI' },
-    title: { EN: 'GOD OF TRICKERY', ES: 'DIOS DEL ENGAÑO' },
-    description: {
-      EN: 'A trickster figure associated with chaos, cunning and transformation. Loki has a complex and often adversarial relationship with the other gods.',
-      ES: 'Figura embaucadora asociada con el caos, la astucia y la transformación. Loki mantiene una relación compleja y a menudo conflictiva con los demás dioses.',
-    },
-  },
-  skadi: {
-    name: { EN: 'SKADI', ES: 'SKADI' },
-    title: { EN: 'GODDESS OF HUNT AND WINTER', ES: 'DIOSA DE LA CAZA Y EL INVIERNO' },
-    description: {
-      EN: 'A Norse goddess associated with hunting, winter and the mountains. Skadi is renowned for her independence and strength.',
-      ES: 'Diosa nórdica asociada con la caza, el invierno y las montañas. Skadi destaca por su independencia y fortaleza.',
-    },
-  },
-  odin: {
-    name: { EN: 'ODIN', ES: 'ODÍN' },
-    title: { EN: 'GOD OF WISDOM AND MAGIC', ES: 'DIOS DE LA SABIDURÍA Y LA MAGIA' },
-    description: {
-      EN: 'Chief among the Aesir gods. Odin is associated with wisdom, war, death, poetry and magic.',
-      ES: 'Principal entre los dioses Æsir. Odín está asociado con la sabiduría, la guerra, la muerte, la poesía y la magia.',
-    },
-  },
-  valkyrie: {
-    name: { EN: 'VALKYRIE', ES: 'VALQUIRIA' },
-    title: { EN: 'CHOOSER OF THE SLAIN', ES: 'SELECTORA DE LOS CAÍDOS' },
-    description: {
-      EN: 'Female figures in Norse mythology who choose among those slain in battle and are closely associated with Odin and the warrior afterlife.',
-      ES: 'Figuras femeninas de la mitología nórdica que eligen entre quienes mueren en batalla y están estrechamente asociadas con Odín y el destino de los guerreros tras la muerte.',
-    },
-  },
-  forseti: {
-    name: { EN: 'FORSETI', ES: 'FORSETI' },
-    title: { EN: 'GOD OF TRUTH AND JUSTICE', ES: 'DIOS DE LA VERDAD Y LA JUSTICIA' },
-    description: {
-      EN: 'A Norse god associated with justice and the settlement of disputes. Forseti is presented as a figure of reconciliation and judgement.',
-      ES: 'Dios nórdico asociado con la justicia y la resolución de disputas. Forseti aparece como una figura vinculada con la reconciliación y el juicio.',
-    },
-  },
-  thor: {
-    name: { EN: 'THOR', ES: 'THOR' },
-    title: { EN: 'GOD OF THUNDER', ES: 'DIOS DEL TRUENO' },
-    description: {
-      EN: 'Son of Odin and one of the mightiest Norse gods. Thor protects gods and humans and wields the famous hammer Mjölnir.',
-      ES: 'Hijo de Odín y uno de los dioses nórdicos más poderosos. Thor protege a dioses y humanos y empuña el célebre martillo Mjölnir.',
-    },
-  },
-};
+  ])
+);
 
 const LORE_ENTRIES: Partial<Record<string, LoreEntry>> = {
   zeus: {
-    title: { EN: 'ZEUS', ES: 'ZEUS' },
-    subtitle: { EN: 'KING OF THE GODS', ES: 'REY DE LOS DIOSES' },
+    title: { EN: loreEntriesEN.zeus.title, ES: loreEntriesES.zeus.title },
+    subtitle: { EN: loreEntriesEN.zeus.subtitle, ES: loreEntriesES.zeus.subtitle },
     mythology: {
-      EN: 'Prototype entry. This area is ready for the complete mythological and historical text about Zeus.',
-      ES: 'Entrada de prototipo. Esta sección está preparada para incorporar el texto mitológico e histórico completo sobre Zeus.',
+      EN: loreEntriesEN.zeus.mythology,
+      ES: loreEntriesES.zeus.mythology,
     },
     archaeology: {
-      EN: 'This area is reserved for the archaeological object, its chronology, provenance, interpretation and museum context.',
-      ES: 'Esta sección está reservada para la pieza arqueológica, su cronología, procedencia, interpretación y contexto museístico.',
+      EN: loreEntriesEN.zeus.archaeology,
+      ES: loreEntriesES.zeus.archaeology,
     },
   },
   thor: {
-    title: { EN: 'THOR', ES: 'THOR' },
-    subtitle: { EN: 'GOD OF THUNDER', ES: 'DIOS DEL TRUENO' },
+    title: { EN: loreEntriesEN.thor.title, ES: loreEntriesES.thor.title },
+    subtitle: { EN: loreEntriesEN.thor.subtitle, ES: loreEntriesES.thor.subtitle },
     mythology: {
-      EN: 'Prototype entry. This area is ready for the complete mythological and historical text about Thor.',
-      ES: 'Entrada de prototipo. Esta sección está preparada para incorporar el texto mitológico e histórico completo sobre Thor.',
+      EN: loreEntriesEN.thor.mythology,
+      ES: loreEntriesES.thor.mythology,
     },
     archaeology: {
-      EN: 'This area is reserved for the archaeological object, its chronology, provenance, interpretation and museum context.',
-      ES: 'Esta sección está reservada para la pieza arqueológica, su cronología, procedencia, interpretación y contexto museístico.',
+      EN: loreEntriesEN.thor.archaeology,
+      ES: loreEntriesES.thor.archaeology,
     },
   },
 };
@@ -1469,9 +1016,7 @@ function nextWarrior() {
   }
 
   function resetProgress() {
-    const confirmed = window.confirm(
-      'Reset all Glory and warrior unlock progress? This cannot be undone.'
-    );
+    const confirmed = window.confirm(t.resetConfirmation);
 
     if (!confirmed) return;
 
@@ -1752,14 +1297,14 @@ const displayedThorWarrior =
           ? t.chooseSideFirst
           : t.chooseSideSecond
         : gameMode === 'LOCAL'
-          ? `${turn === 'X' ? 'PLAYER 1' : 'PLAYER 2'} TURN · ${localCurrentWarrior.name}`
+          ? `${turn === 'X' ? t.playerOne : t.playerTwo} · ${localCurrentWarrior.name}`
           : thinking
-            ? `Enemy turn · ${enemyWarrior.name}`
-            : `Your turn · ${warriorText(humanWarrior).name}`;
+            ? `${t.enemyTurn} · ${enemyWarrior.name}`
+            : `${t.yourTurnShort} · ${warriorText(humanWarrior).name}`;
   const resultTitle = winner
     ? winner === humanMark
-      ? 'YOU WON'
-      : 'YOU HAVE BEEN DEFEATED'
+      ? t.youWon
+      : t.youLost
     : t.draw;
 
   const resultClass = winner === humanMark
@@ -1782,7 +1327,7 @@ const displayedThorWarrior =
         <button
           className="music-button"
           onClick={toggleSound}
-          aria-label={soundMuted ? 'Activar sonido' : 'Silenciar sonido'}
+          aria-label={soundMuted ? t.activateSound : t.muteSound}
         >
           {soundMuted ? '🔇' : '🔊'}
         </button>
@@ -1812,8 +1357,8 @@ const displayedThorWarrior =
           type="button"
           className={`god-vase-button ${godMode ? 'active' : ''}`}
           onClick={openGodModeLogin}
-          aria-label={godMode ? 'Deactivate God Mode' : 'Divine access'}
-          title={godMode ? 'God Mode active' : 'Divine access'}
+          aria-label={godMode ? t.deactivateGodMode : t.divineAccess}
+          title={godMode ? t.godModeActive : t.divineAccess}
         >
           🏺
         </button>
@@ -1858,7 +1403,7 @@ const displayedThorWarrior =
             onClick={() => selectArmy(ZEUS)}
             disabled={battleStarted}
           >
-            ⚡ GREEKS
+            ⚡ {t.greeks}
           </button>
 
           <button
@@ -1866,25 +1411,25 @@ const displayedThorWarrior =
             onClick={() => selectArmy(THOR)}
             disabled={battleStarted}
           >
-            NORSE 🔨
+            {t.norse} 🔨
           </button>
 
           <button
             className={`player-choice ${humanMark === 'X' ? 'selected zeus' : ''}`}
             onClick={() => selectMark('X')}
             disabled={battleStarted}
-            aria-label="Jugar primero como X"
+            aria-label={t.playFirstAsX}
           >
-            X · FIRST
+            X · {t.first}
           </button>
 
           <button
             className={`player-choice ${humanMark === 'O' ? 'selected thor' : ''}`}
             onClick={() => selectMark('O')}
             disabled={battleStarted}
-            aria-label="Jugar segundo como O"
+            aria-label={t.playSecondAsO}
           >
-            O · SECOND
+            O · {t.second}
           </button>
         </div>
 
@@ -1896,7 +1441,7 @@ const displayedThorWarrior =
             aria-label={`Change Greek warrior. Current warrior: ${displayedZeusWarrior.name}`}
           >
             <span className="battle-warrior-role">
-              {humanArmy === ZEUS ? 'YOUR WARRIOR' : 'ENEMY WARRIOR'}
+              {humanArmy === ZEUS ? t.yourWarrior : t.enemyWarrior}
             </span>
            <img
               src={displayedZeusWarrior.image}
@@ -1907,9 +1452,9 @@ const displayedThorWarrior =
               {displayedZeusWarrior.name}
             </span>
             <strong>
-              CHANGE ›
+              {t.changeWarrior}
               {newZeusWarriors.length > 0 && (
-                <span className="change-warrior-new">NEW!</span>
+                <span className="change-warrior-new">{t.newLabel}</span>
               )}
             </strong>
           </button>
@@ -1923,13 +1468,13 @@ const displayedThorWarrior =
               }`}
               aria-label={
                 humanArmy === ZEUS
-                  ? 'You are playing as Greeks'
-                  : 'You are playing as Norse'
+                  ? t.playingAsGreeks
+                  : t.playingAsNorse
               }
               title={
                 humanArmy === ZEUS
-                  ? 'Your side: Greeks'
-                  : 'Your side: Norse'
+                  ? t.yourSideGreeks
+                  : t.yourSideNorse
               }
             >
               <span className="current-side-quick-icon">
@@ -1950,13 +1495,13 @@ const displayedThorWarrior =
               disabled={battleStarted}
               aria-label={
                 randomRival
-                  ? 'Disable random rival'
-                  : 'Enable random rival'
+                  ? t.disableRandomRival
+                  : t.enableRandomRival
               }
               title={
                 randomRival
-                  ? 'Random rival ON'
-                  : 'Random rival OFF'
+                  ? t.randomRivalOn
+                  : t.randomRivalOff
               }
             >
               <span className="random-rival-quick-icon">🎲</span>
@@ -1973,14 +1518,14 @@ const displayedThorWarrior =
             aria-label={`Change Norse warrior. Current warrior: ${displayedThorWarrior.name}`}
           >
             <span className="battle-warrior-role">
-              {humanArmy === THOR ? 'YOUR WARRIOR' : 'ENEMY WARRIOR'}
+              {humanArmy === THOR ? t.yourWarrior : t.enemyWarrior}
             </span>
             <img src={displayedThorWarrior.image} alt={displayedThorWarrior.name} />
             <span className="battle-warrior-name">{displayedThorWarrior.name}</span>
             <strong>
-              CHANGE ›
+              {t.changeWarrior}
               {newThorWarriors.length > 0 && (
-                <span className="change-warrior-new">NEW!</span>
+                <span className="change-warrior-new">{t.newLabel}</span>
               )}
             </strong>
           </button>
@@ -2086,21 +1631,21 @@ const displayedThorWarrior =
               className="god-mode-modal"
               role="dialog"
               aria-modal="true"
-              aria-label="Divine access"
+              aria-label={t.divineAccess}
               onClick={(event) => event.stopPropagation()}
             >
               <button
                 type="button"
                 className="god-mode-close"
                 onClick={() => setShowGodModeLogin(false)}
-                aria-label="Close divine access"
+                aria-label={t.close}
               >
                 ×
               </button>
 
               <div className="god-mode-vase">🏺</div>
-              <div className="god-mode-kicker">DIVINE ACCESS</div>
-              <h2>AWAKEN THE GODS</h2>
+              <div className="god-mode-kicker">{t.divineAccess}</div>
+              <h2>{t.awakenTheGods}</h2>
 
               <input
                 className={godModeError ? 'error' : ''}
@@ -2113,7 +1658,7 @@ const displayedThorWarrior =
                 onKeyDown={(event) => {
                   if (event.key === 'Enter') activateGodMode();
                 }}
-                placeholder="ENTER CODE"
+                placeholder={t.enterCode}
                 autoComplete="off"
                 autoCapitalize="characters"
                 spellCheck={false}
@@ -2121,7 +1666,7 @@ const displayedThorWarrior =
               />
 
               {godModeError && (
-                <div className="god-mode-error">ACCESS DENIED</div>
+                <div className="god-mode-error">{t.accessDenied}</div>
               )}
 
               <button
@@ -2129,7 +1674,7 @@ const displayedThorWarrior =
                 className="god-mode-awaken"
                 onClick={activateGodMode}
               >
-                AWAKEN
+                {t.awaken}
               </button>
             </div>
           </div>
@@ -2144,20 +1689,20 @@ const displayedThorWarrior =
               className="difficulty-modal"
               role="dialog"
               aria-modal="true"
-              aria-label="Choose difficulty"
+              aria-label={t.chooseDifficulty}
               onClick={(event) => event.stopPropagation()}
             >
               <button
                 type="button"
                 className="difficulty-close"
                 onClick={() => setShowDifficulty(false)}
-                aria-label="Close difficulty selector"
+                aria-label={t.close}
               >
                 ×
               </button>
 
               <div className="difficulty-kicker">
-                CHOOSE HOW TO BATTLE
+                {t.chooseHowToBattle}
               </div>
 
               <h2>{t.battleMode}</h2>
@@ -2169,8 +1714,8 @@ const displayedThorWarrior =
                   className={`difficulty-option ${gameMode === 'CPU' ? 'selected' : ''}`}
                   onClick={() => setGameMode('CPU')}
                 >
-                  <strong>⚔ VS CPU</strong>
-                  <span>Battle the gods</span>
+                  <strong>⚔ {t.vsCpu}</strong>
+                  <span>{t.battleTheGods}</span>
                 </button>
 
                 <button
@@ -2178,8 +1723,8 @@ const displayedThorWarrior =
                   className={`difficulty-option ${gameMode === 'LOCAL' ? 'selected' : ''}`}
                   onClick={() => setGameMode('LOCAL')}
                 >
-                  <strong>👥 2 PLAYERS</strong>
-                  <span>Share this device</span>
+                  <strong>👥 {t.twoPlayersLabel}</strong>
+                  <span>{t.shareThisDevice}</span>
                 </button>
 
               </div>
@@ -2187,7 +1732,7 @@ const displayedThorWarrior =
               {gameMode === 'CPU' && (
                 <>
                   <div className="difficulty-kicker">
-                    CHOOSE YOUR CHALLENGE
+                    {t.chooseYourChallenge}
                   </div>
 
                   <div className="difficulty-options">
@@ -2214,7 +1759,7 @@ const displayedThorWarrior =
                   </div>
 
                   <div className="difficulty-kicker">
-                    ENEMY SELECTION
+                    {t.enemySelection}
                   </div>
 
                   <div className="difficulty-options">
@@ -2224,11 +1769,11 @@ const displayedThorWarrior =
                       onClick={toggleRandomRival}
                     >
                       <strong>
-                        🎲 RANDOM RIVAL · {randomRival ? 'ON' : 'OFF'}
+                        🎲 {t.randomRival} · {randomRival ? t.randomOn : t.randomOff}
                       </strong>
 
                       <span>
-                        Fight a random unlocked enemy each battle
+                        {t.randomDesc}
                       </span>
                     </button>
                   </div>
@@ -2264,25 +1809,25 @@ const displayedThorWarrior =
               className={`warrior-modal ${selectorArmy === ZEUS ? 'zeus' : 'thor'}`}
               role="dialog"
               aria-modal="true"
-              aria-label="Warrior selection"
+              aria-label={t.warriorSelection}
               onClick={(event) => event.stopPropagation()}
             >
               <button
                 className="warrior-modal-close"
                 onClick={() => setShowWarriorSelector(false)}
-                aria-label="Close warrior selector"
+                aria-label={t.close}
               >
                 ×
               </button>
 
               <div className="warrior-modal-faction">
-                {selectorArmy === ZEUS ? '⚡ GREEK PANTHEON' : 'NORSE PANTHEON 🔨'}
+                {selectorArmy === ZEUS ? `⚡ ${t.greekPantheon}` : `${t.norsePantheon} 🔨`}
               </div>
 
               <button
                 className="warrior-modal-arrow left"
                 onClick={previousWarrior}
-                aria-label="Previous warrior"
+                aria-label={t.previousWarrior}
               >
                 ‹
               </button>
@@ -2317,18 +1862,18 @@ const displayedThorWarrior =
 
                 {previewUnlocked &&
                   (selectorArmy === ZEUS ? newZeusWarriors : newThorWarriors).includes(warriorPreviewIndex) && (
-                    <div className="warrior-modal-new">NEW!</div>
+                    <div className="warrior-modal-new">{t.newLabel}</div>
                   )}
 
                 {previewEquipped && (
-                  <div className="warrior-modal-equipped">✓ EQUIPPED</div>
+                  <div className="warrior-modal-equipped">✓ {t.equipped}</div>
                 )}
               </button>
 
               <button
                 className="warrior-modal-arrow right"
                 onClick={nextWarrior}
-                aria-label="Next warrior"
+                aria-label={t.nextWarrior}
               >
                 ›
               </button>
@@ -2342,7 +1887,7 @@ const displayedThorWarrior =
 
               {!previewUnlocked ? (
                 <div className="warrior-modal-requirement">
-                  <strong>🔒 REQUIRES {previewWarrior.unlockAt} WINS AGAINST THIS PANTHEON</strong>
+                  <strong>🔒 {t.requires} {previewWarrior.unlockAt} {t.winsAgainstPantheon}</strong>
                   <span>{currentWins} / {previewWarrior.unlockAt}</span>
                   <div className="warrior-modal-progress">
                     <div
@@ -2368,7 +1913,7 @@ const displayedThorWarrior =
                       selectorArmy === ZEUS ? 'zeus' : 'thor'
                     }`}
                   >
-                    ✓ YOUR CURRENT SIDE
+                    ✓ {t.currentSideStatus}
                   </div>
                 ) : (
                   <button
@@ -2397,9 +1942,9 @@ const displayedThorWarrior =
                 <button
                   className="modal-reset-progress"
                   onClick={resetProgress}
-                  title="Reset Glory and unlocks"
+                  title={t.resetProgress}
                 >
-                  ↺ RESET PROGRESS
+                  ↺ {t.resetProgress}
                 </button>
               </div>
             </div>
@@ -2505,8 +2050,8 @@ const displayedThorWarrior =
                           <span className="codex-entry-text">
                             <strong>{unlocked ? warriorText(warrior).name : t.locked}</strong>
                             <small>{unlocked
-                              ? (language === 'ES' ? 'VER HISTORIA Y CONTEXTO' : 'VIEW HISTORY & CONTEXT')
-                              : `${warrior.unlockAt} GLORY`}</small>
+                              ? t.viewHistory
+                              : `${warrior.unlockAt} ${t.glory}`}</small>
                           </span>
                           {unlocked && <span className="codex-entry-arrow">›</span>}
                         </button>
@@ -2549,7 +2094,7 @@ const displayedThorWarrior =
                     className="view-unlocked-warrior"
                     onClick={viewUnlockedWarrior}
                   >
-                    VIEW WARRIOR ›
+                    {t.viewWarrior}
                   </button>
                 </div>
               ) : null}
