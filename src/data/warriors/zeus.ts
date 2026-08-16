@@ -69,7 +69,7 @@ export const ZEUS_WARRIORS: Warrior[] = [
     sound: hadesSound,
   },
   {
-    id: 'Demeter',
+    id: 'demeter',
     name: 'DEMETER',
     title: 'GODDESS OF THE EARTH',
     description: 'Goddess of the harvest, agriculture, and the seasons. Demeter is associated with the cycle of life and death.',
@@ -78,7 +78,7 @@ export const ZEUS_WARRIORS: Warrior[] = [
     sound: demeterSound,
   },
   {
-    id: 'Poseidon',
+    id: 'poseidon',
     name: 'POSEIDON',
     title: 'GOD OF THE SEA',
     description: 'Brother of Zeus and Hades. Poseidon is the god of the sea, earthquakes, and horses.',
