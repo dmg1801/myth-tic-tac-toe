@@ -79,6 +79,7 @@ const WARRIOR_SELECTION_STORAGE_KEY = 'zeus-vs-thor-warrior-selection-v1';
 const RANDOM_RIVAL_STORAGE_KEY = 'zeus-vs-thor-random-rival-v1';
 const ACKNOWLEDGED_WARRIORS_STORAGE_KEY = 'zeus-vs-thor-acknowledged-warriors-v2';
 const LANGUAGE_STORAGE_KEY = 'zeus-vs-thor-language-v1';
+const MUSEUM_VIEWED_STORAGE_KEY = 'zeus-vs-thor-museum-viewed-v1';
 
 type LoreEntry = {
   title: { EN: string; ES: string };
@@ -427,6 +428,15 @@ const [selectedThorWarrior, setSelectedThorWarrior] = useState(() =>
         };
   };
 
+  const [museumViewedWarriors, setMuseumViewedWarriors] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem(MUSEUM_VIEWED_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : ['hoplite', 'ulfsark'];
+    } catch {
+      return ['hoplite', 'ulfsark'];
+    }
+  });
+
   const [showCodex, setShowCodex] = useState(false);
   const [showMuseumMenu, setShowMuseumMenu] = useState(false);
   const [codexArmy, setCodexArmy] = useState<Army>(ZEUS);
@@ -462,6 +472,28 @@ const [selectedThorWarrior, setSelectedThorWarrior] = useState(() =>
       !acknowledgedWarriors.thor.includes(index)
     )
     .map(({ index }) => index);
+
+  const museumNewWarriorIds = [
+    ...ZEUS_WARRIORS.filter((warrior, index) =>
+      index > 0 &&
+      zeusTotalWins >= warrior.unlockAt &&
+      !museumViewedWarriors.includes(warrior.id)
+    ).map(warrior => warrior.id),
+    ...THOR_WARRIORS.filter((warrior, index) =>
+      index > 0 &&
+      thorTotalWins >= warrior.unlockAt &&
+      !museumViewedWarriors.includes(warrior.id)
+    ).map(warrior => warrior.id),
+  ];
+
+  const hasNewMuseumContent = museumNewWarriorIds.length > 0;
+  const hasNewGreekMuseumContent = ZEUS_WARRIORS.some(
+  warrior => museumNewWarriorIds.includes(warrior.id)
+  );
+
+  const hasNewNorseMuseumContent = THOR_WARRIORS.some(
+  warrior => museumNewWarriorIds.includes(warrior.id)
+  );
 
   const unlockedWarrior = unlockNotice
     ? (unlockNotice.army === ZEUS ? ZEUS_WARRIORS : THOR_WARRIORS)[unlockNotice.slot]
@@ -962,11 +994,34 @@ function nextWarrior() {
     playSound(pageSound, AUDIO_VOLUME.page);
   }
 
+  function openWarriorFromMuseum() {
+  if (!loreWarrior) return;
+
+  const warriors =
+    codexArmy === ZEUS ? ZEUS_WARRIORS : THOR_WARRIORS;
+
+  const warriorIndex = warriors.findIndex(
+    warrior => warrior.id === loreWarrior.id
+  );
+
+  if (warriorIndex === -1) return;
+
+  setShowCodex(false);
+  setShowMuseumMenu(false);
+  setSelectedLoreWarriorId(null);
+  setCodexReturnToRoster(false);
+
+  setSelectorArmy(codexArmy);
+  setWarriorPreviewIndex(warriorIndex);
+  setShowWarriorSelector(true);
+
+  playSound(pageSound, AUDIO_VOLUME.page);
+}
+
   function openPreviewLore() {
     if (!previewUnlocked) return;
     setCodexArmy(selectorArmy);
-    setSelectedLoreWarriorId(previewWarrior.id);
-    playSound(previewWarrior.sound, AUDIO_VOLUME.selection);
+    openLoreWarrior(previewWarrior);
     setCodexReturnToRoster(true);
     setShowWarriorSelector(false);
     setShowCodex(true);
@@ -975,6 +1030,14 @@ function nextWarrior() {
 
   function openLoreWarrior(warrior: Warrior) {
     setSelectedLoreWarriorId(warrior.id);
+
+    setMuseumViewedWarriors(current => {
+      if (current.includes(warrior.id)) return current;
+      const next = [...current, warrior.id];
+      localStorage.setItem(MUSEUM_VIEWED_STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+
     playSound(warrior.sound, AUDIO_VOLUME.selection);
   }
 
@@ -999,11 +1062,15 @@ function nextWarrior() {
   }
 
   function backFromLore() {
-    if (codexReturnToRoster) {
-      closeCodex();
-    } else {
-      setSelectedLoreWarriorId(null);
-    }
+    setSelectedLoreWarriorId(null);
+    setCodexReturnToRoster(false);
+  }
+
+  function backFromCodexIndex() {
+    setShowCodex(false);
+    setSelectedLoreWarriorId(null);
+    setCodexReturnToRoster(false);
+    setShowMuseumMenu(true);
   }
 
   function openWarriorSelector(army: Army) {
@@ -1555,11 +1622,14 @@ const displayedThorWarrior =
           disabled={battleStarted}
           aria-label={language === 'ES' ? 'Abrir museo' : 'Open museum'}
           title={language === 'ES' ? 'Historia y arqueología' : 'History & archaeology'}
-         >
+        >
           <span className="museum-quick-icon">🏛️</span>
-          <span>
-            {language === 'ES' ? 'MUSEO' : 'MUSEUM'}
-          </span>
+          <span>{language === 'ES' ? 'MUSEO' : 'MUSEUM'}</span>
+          {hasNewMuseumContent && (
+            <span className="museum-quick-new">
+              {language === 'ES' ? 'NUEVO' : 'NEW'}
+            </span>
+          )}
         </button>
 
         <div className={`board-hitbox ${thinking ? 'locked' : ''}`}>
@@ -1835,13 +1905,39 @@ const displayedThorWarrior =
               <h2>{language === 'ES' ? 'MUSEO' : 'MUSEUM'}</h2>
 
               <div className="museum-menu-options">
-                <button type="button" className="museum-pantheon greek" onClick={() => openCodex(ZEUS)}>
-                  <strong>⚡ {t.greekPantheon}</strong>
+                <button
+                  type="button"
+                  className="museum-pantheon greek"
+                  onClick={() => openCodex(ZEUS)}
+                >
+                  <strong>
+                    ⚡ {t.greekPantheon}
+
+                    {hasNewGreekMuseumContent && (
+                      <span className="museum-pantheon-new">
+                        {language === 'ES' ? 'NUEVO' : 'NEW'}
+                      </span>
+                    )}
+                  </strong>
+
                   <span>{t.explorePantheon}</span>
                 </button>
 
-                <button type="button" className="museum-pantheon norse" onClick={() => openCodex(THOR)}>
-                  <strong>{t.norsePantheon} 🔨</strong>
+                <button
+                  type="button"
+                  className="museum-pantheon norse"
+                  onClick={() => openCodex(THOR)}
+                >
+                  <strong>
+                    {t.norsePantheon} 🔨
+
+                    {hasNewNorseMuseumContent && (
+                      <span className="museum-pantheon-new">
+                        {language === 'ES' ? 'NUEVO' : 'NEW'}
+                      </span>
+                    )}
+                  </strong>
+
                   <span>{t.explorePantheon}</span>
                 </button>
               </div>
@@ -2005,7 +2101,7 @@ const displayedThorWarrior =
           <div className="codex-screen" role="dialog" aria-modal="true">
             <div className="codex-page">
               <div className="codex-nav">
-                <button type="button" className="codex-nav-button" onClick={loreWarrior ? backFromLore : closeCodex}>
+                <button type="button" className="codex-nav-button" onClick={loreWarrior ? backFromLore : backFromCodexIndex}>
                   ← {t.back}
                 </button>
                 <div className="codex-language" aria-label="Language">
@@ -2048,9 +2144,27 @@ const displayedThorWarrior =
 
                   <div className="codex-comparison">
                     <figure>
-                      <div className="codex-image-box game-art">
-                        <img src={loreWarrior.image} alt={loreWarrior.name} />
-                      </div>
+                      <button
+                        type="button"
+                        className="codex-image-box game-art codex-play-warrior"
+                        onClick={openWarriorFromMuseum}
+                        aria-label={
+                          language === 'ES'
+                            ? `Jugar con ${warriorText(loreWarrior).name}`
+                            : `Play as ${warriorText(loreWarrior).name}`
+                        }
+                      >
+                        <img
+                          src={loreWarrior.image}
+                          alt={warriorText(loreWarrior).name}
+                        />
+
+                        <span className="codex-play-warrior-label">
+                          {language === 'ES'
+                            ? 'JUGAR CON ESTE PERSONAJE ›'
+                            : 'PLAY AS THIS WARRIOR ›'}
+                        </span>
+                      </button>
                       <figcaption>{t.gameArt}</figcaption>
                     </figure>
                     <figure>
@@ -2097,7 +2211,14 @@ const displayedThorWarrior =
                           <span className="codex-entry-number">{String(index + 1).padStart(2, '0')}</span>
                           <span className="codex-entry-image">{unlocked ? <img src={warrior.image} alt="" /> : '🔒'}</span>
                           <span className="codex-entry-text">
-                            <strong>{unlocked ? warriorText(warrior).name : t.locked}</strong>
+                            <strong>
+                              {unlocked ? warriorText(warrior).name : t.locked}
+                              {unlocked && museumNewWarriorIds.includes(warrior.id) && (
+                                <span className="codex-entry-new">
+                                  {language === 'ES' ? 'NUEVO' : 'NEW'}
+                                </span>
+                              )}
+                            </strong>
                             <small>{unlocked
                               ? t.viewHistory
                               : `${warrior.unlockAt} ${t.glory}`}</small>
@@ -2153,7 +2274,7 @@ const displayedThorWarrior =
           </div>
         )}
         <div className="game-signature">
-          ZEUS vs THOR · v4.0.0 · a game by Diego Mongay
+          ZEUS vs THOR · v5.0.0 · dmongayg - @pasoveoleo - 2026
         </div>
       </section>
     </main>
