@@ -1,1 +1,0 @@
-Añade player1.png y player2.png en esta carpeta. Se recomiendan PNG cuadrados con fondo transparente.

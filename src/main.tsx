@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './style.css';
-import boardImage from './assets/boards/zeus-thor-board.png';
-import player1Image from './assets/players/player1.png';
-import player2Image from './assets/players/player2.png';
+import boardImage from './assets/boards/board.png';
+import player1Image from './assets/players/hoplita.png';
+import player2Image from './assets/players/ulfsark.png';
 
 import athenaImage from './assets/players/athena.png';
 import minotaurImage from './assets/players/minotaur.png';
@@ -213,7 +213,7 @@ const THOR_WARRIORS: Warrior[] = [
   {
     id: 'loki',
     name: 'LOKI',
-    title: 'GOD OF MESSAGING',
+    title: 'GOD OF MESSAGING AND TRICKERY',
     description: 'Trickster god associated with chaos, cunning, and magic. Loki is known for his shape-shifting abilities and his complex relationship with the other gods.',
     unlockAt: 7,
     image: lokiImage,
