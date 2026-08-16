@@ -15,7 +15,7 @@ import frostGiantImage from './assets/players/frost-giant.png';
 import helaImage from './assets/players/hela.png';
 import thorImage from './assets/players/thor.png';
 
-import friggaImage from './assets/players/frigg.png';
+import forsetiImage from './assets/players/forseti.png';
 import lokiImage from './assets/players/loki.png';
 import odinImage from './assets/players/odin.png';
 import skadiImage from './assets/players/skadi.png';
@@ -47,7 +47,7 @@ import lokiSound from './assets/sounds/loki.mp3';
 import skadiSound from './assets/sounds/skadi.mp3';
 import odinSound from './assets/sounds/odin.mp3';
 import valkyrieSound from './assets/sounds/valkiria.mp3';
-import friggaSound from './assets/sounds/frigg.mp3';
+import forsetiSound from './assets/sounds/forseti.mp3';
 import defeatSound from './assets/sounds/defeat.mp3';
 import drawSound from './assets/sounds/draw.mp3';
 import ambienceSound from './assets/sounds/ambience.mp3';
@@ -247,13 +247,13 @@ const THOR_WARRIORS: Warrior[] = [
     sound: valkyrieSound,
   },
    {
-    id: 'Frigga',
-    name: 'FRIGGA',
-    title: 'GODDESS OF MARRIAGE AND FAMILY',
-    description: 'The wife of Odin and the queen of Asgard. Frigga is associated with marriage, fertility, and the domestic sphere.',
+    id: 'forseti',
+    name: 'FORSETI',
+    title: 'GOD OF TRUTH AND JUSTICE',
+    description: 'The god of truth and justice in Norse mythology. Forseti is known for his fairness and his role in mediating disputes.',
     unlockAt: 16,
-    image: friggaImage,
-    sound: friggaSound,
+    image: forsetiImage,
+    sound: forsetiSound,
   },
   {
     id: 'thor',
