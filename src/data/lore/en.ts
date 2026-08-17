@@ -127,7 +127,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'Hestia was the goddess of the hearth, domesticity, and the sacred fire that bound the household and the city together.',
     archaeology:
       'Hestia is often associated with domestic hearths, ritual fireplaces, and the sacred spaces where family and civic identity were maintained.',
-    archaeologicalCaption: 'Archaeological object description pending.',
+    archaeologicalCaption: 'Hestia holding a branch of a chaste-tree, red-figure kylix, attributed to Oltos/n/n Tarquinia National Museum',
     archaeologicalImage: hestaLoreImage,
   },
   hermes: {
@@ -137,7 +137,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'Hermes was the swift messenger of the gods, patron of travel, trade, boundaries, and cunning. He linked divine speech to movement and exchange.',
     archaeology:
       'Archaeological traces of Hermes connect to travel culture, devotional objects, and the material world of trade routes and border crossings.',
-    archaeologicalCaption: 'Hestia holding a branch of a chaste-tree, red-figure kylix, attributed to Oltos/n/n Tarquinia National Museum',
+    archaeologicalCaption: 'Hermes with his caduceus, detail of a kylix.',
     archaeologicalImage: hermesLoreImage,
   },
   ulfsark: {

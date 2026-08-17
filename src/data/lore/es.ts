@@ -157,7 +157,7 @@ export const loreEntriesES: Record<string, LoreText> = {
     archaeology:
       'Las huellas arqueológicas de Hermes se relacionan con la cultura del desplazamiento, los objetos devocionales y el mundo material de rutas comerciales y cruces fronterizos.',
     archaeologicalCaption:
-      'Hestia sosteniendo una rama de árbol casto, en una kílix de figuras rojas atribuida a Oltos.\n\nMuseo Nacional de Tarquinia.',
+      'Hermes con su caduceo, detalle de una vasija.',
     archaeologicalImage: hermesLoreImage,
   },
 
