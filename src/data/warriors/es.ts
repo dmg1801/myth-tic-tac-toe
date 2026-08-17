@@ -84,10 +84,10 @@ export const warriorI18nES: Record<string, WarriorLocaleText> = {
       'Los jötnar son seres poderosos de la mitología nórdica, frecuentemente enfrentados a los dioses y vinculados con las fuerzas salvajes del cosmos.',
   },
   hela: {
-    name: 'HEL',
+    name: 'HELA',
     title: 'SOBERANA DE LOS MUERTOS',
     description:
-      'Hija de Loki y soberana del reino también llamado Hel. Recibe a muchos de quienes mueren por enfermedad o vejez.',
+      'Hija de Loki y soberana del reino también llamado Hela. Recibe a muchos de quienes mueren por enfermedad o vejez.',
   },
   loki: {
     name: 'LOKI',

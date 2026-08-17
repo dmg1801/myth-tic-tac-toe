@@ -147,7 +147,7 @@ export const loreEntriesES: Record<string, LoreText> = {
     archaeologicalImage: freyaLoreImage,
   },
   'frost-giant': {
-    title: 'GIANT DE HIELO',
+    title: 'GIGANTE DE HIELO',
     subtitle: 'JÖTUNN DEL NORTE',
     mythology:
       'Los jötnar eran seres primordiales de hielo, naturaleza salvaje y fuerza cósmica, a menudo opuestos a los dioses y representando el mundo brumoso más allá del orden.',
@@ -156,12 +156,12 @@ export const loreEntriesES: Record<string, LoreText> = {
     archaeologicalImage: frostGiantLoreImage,
   },
   hela: {
-    title: 'HEL',
+    title: 'HELA',
     subtitle: 'SEÑORA DE LOS MUERTOS',
     mythology:
-      'Hel era la señora del reino de los muertos para quienes no morían gloriosamente en batalla. Su dominio era frío, oculto y definitivo.',
+      'Hela era la señora del reino de los muertos para quienes no morían gloriosamente en batalla. Su dominio era frío, oculto y definitivo.',
     archaeology:
-      'La presencia de Hel se lee a través del simbolismo funerario, el reino de los muertos y la comprensión nórdica de la muerte como un dominio con su propia orden.',
+      'La presencia de Hela se lee a través del simbolismo funerario, el reino de los muertos y la comprensión nórdica de la muerte como un dominio con su propia orden.',
     archaeologicalImage: helaLoreImage,
   },
   loki: {
@@ -192,7 +192,7 @@ export const loreEntriesES: Record<string, LoreText> = {
     archaeologicalImage: odinLoreImage,
   },
   valkyrie: {
-    title: 'VALKYRIE',
+    title: 'VALQUIRIA',
     subtitle: 'ELEGIDORA DE LOS CAÍDOS',
     mythology:
       'Las valquirias eran elegidoras divinas de los caídos, seleccionando guerreros para Valhalla y llevando muertos a los salones de los honrados.',
