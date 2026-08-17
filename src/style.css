@@ -2182,3 +2182,46 @@ main {
   .random-rival-quick.on-enemy { right: -4px; left: auto; }
   .current-side-quick.on-player { left: 4px; right: auto; }
 }
+
+
+/* =========================================================
+   FACTION-AWARE SIDE ORIENTATION
+   Greek PNGs and Norse PNGs have opposite native facing.
+   LEFT must always face right; RIGHT must always face left.
+   ========================================================= */
+
+/* Greek art: native orientation = faces right. */
+.warrior-modal-image.army-zeus.side-left,
+.status-warrior-image.army-zeus.side-left {
+  transform: scaleX(1);
+}
+
+.warrior-modal-image.army-zeus.side-right,
+.status-warrior-image.army-zeus.side-right {
+  transform: scaleX(-1);
+}
+
+/* Norse art: native orientation = faces left. */
+.warrior-modal-image.army-thor.side-left,
+.status-warrior-image.army-thor.side-left {
+  transform: scaleX(-1);
+}
+
+.warrior-modal-image.army-thor.side-right,
+.status-warrior-image.army-thor.side-right {
+  transform: scaleX(1);
+}
+
+
+/* v6.0.0 — museum archaeological object caption */
+.codex-artifact-caption {
+  max-width: 100%;
+  margin-top: 8px;
+  padding: 0 4px;
+  font-size: 0.68rem;
+  line-height: 1.35;
+  letter-spacing: 0.025em;
+  text-transform: none;
+  opacity: 0.82;
+  text-align: center;
+}

@@ -25,6 +25,7 @@ export type LoreText = {
   subtitle: string;
   mythology: string;
   archaeology: string;
+  archaeologicalCaption?: string;
   archaeologicalImage?: string;
 };
 
@@ -36,6 +37,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'Zeus was the supreme god of Olympus, lord of thunder, lightning, and sky. In Greek tradition, he overthrew the Titans and established divine order among the gods, while also reigning as judge of mortals and immortals.',
     archaeology:
       'Archaeological interpretations of Zeus generally rest on the symbolic power of thunder, lightning, mountain cults, and the sacred spaces associated with Olympian worship. His imagery often appears in bronze votives, monumental sculpture, and temple iconography.',
+    archaeologicalCaption: 'Archaeological object description pending.',
     archaeologicalImage: zeusLoreImage,
   },
   thor: {
@@ -45,6 +47,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'Thor was the son of Odin, defender of Asgard, and wielder of the hammer Mjölnir. He symbolized strength, protection, and the force of divine justice against giants, chaos, and hostile powers.',
     archaeology:
       'The archaeological understanding of Thor is built from Norse iconography, warrior graves, symbol-bearing objects, and the broader ritual landscape of the Scandinavian world.',
+    archaeologicalCaption: 'Archaeological object description pending.',
     archaeologicalImage: thorLoreImage,
   },
   hoplite: {
@@ -54,6 +57,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'The hoplite stood at the heart of classical Greek warfare: a citizen-soldier fighting in disciplined formation, shield to shield, with spear and heavy armor.',
     archaeology:
       'Hoplite warfare is reconstructed from burial remains, panoplies, spearheads, and cemetery evidence that show the centrality of close-order combat in Archaic and Classical Greece.',
+    archaeologicalCaption: 'Archaeological object description pending.',
     archaeologicalImage: hopliteLoreImage,
   },
   athena: {
@@ -63,6 +67,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'Athena was the goddess of wisdom, strategy, and disciplined warfare. She was associated with reason, skill, and the civic virtues of the city-state.',
     archaeology:
       'Athena is often identified through votive objects, bronze statuary, and sanctuaries devoted to her cult in Athens and throughout the Greek world.',
+    archaeologicalCaption: 'Greek vase depicting Athena accompanying Theseus in the hunt for the Minotaur — 4th century BC.',
     archaeologicalImage: athenaLoreImage,
   },
   minotaur: {
@@ -72,6 +77,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'The Minotaur was a monstrous creature of Crete, half man and half bull, bound to the labyrinth and linked to the ordeal of the heroic age.',
     archaeology:
       'The creature’s symbolism is often read through bull imagery, ritual violence, and the mythology of palace culture in the Aegean Bronze Age.',
+    archaeologicalCaption: 'Archaeological object description pending.',
     archaeologicalImage: minotaurLoreImage,
   },
   aphrodite: {
@@ -81,6 +87,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'Aphrodite emerged from the sea foam and became the goddess of love, beauty, desire, and erotic power. Her cult connected desire to both devotion and danger.',
     archaeology:
       'The archaeology of Aphrodite is tied to figurines, ritual objects, and domestic cults emphasizing beauty, fertility, and the sacredness of desire.',
+    archaeologicalCaption: 'Archaeological object description pending.',
     archaeologicalImage: aphroditeLoreImage,
   },
   hades: {
@@ -90,6 +97,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'Hades ruled the realm of the dead after the division of the world among the sons of Cronus. He presided over death, the dead, and the invisible law of the underworld.',
     archaeology:
       'The underworld symbolism of Hades is expressed through funerary objects, tomb imagery, and religious traditions centered on burial and ancestor cult.',
+    archaeologicalCaption: 'Archaeological object description pending.',
     archaeologicalImage: hadesLoreImage,
   },
   demeter: {
@@ -99,6 +107,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'Demeter was the goddess of agriculture, grain, and the seasons. Her grief over the loss of Persephone became a foundational myth of death and renewal.',
     archaeology:
       'Her cult is strongly connected with agricultural rites, fertility symbolism, and the material culture of harvest and cyclical renewal.',
+    archaeologicalCaption: 'Archaeological object description pending.',
     archaeologicalImage: demeterLoreImage,
   },
   poseidon: {
@@ -108,6 +117,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'Poseidon ruled the sea, storms, and horses. He was one of the great Olympians and a force of both creation and unrestrained power.',
     archaeology:
       'Poseidon’s presence is often read through maritime cult, seafaring symbolism, and the ritual geography of coasts, harbors, and sacred shores.',
+    archaeologicalCaption: 'Archaeological object description pending.',
     archaeologicalImage: poseidonLoreImage,
   },
   hesta: {
@@ -117,6 +127,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'Hestia was the goddess of the hearth, domesticity, and the sacred fire that bound the household and the city together.',
     archaeology:
       'Hestia is often associated with domestic hearths, ritual fireplaces, and the sacred spaces where family and civic identity were maintained.',
+    archaeologicalCaption: 'Archaeological object description pending.',
     archaeologicalImage: hestaLoreImage,
   },
   hermes: {
@@ -126,6 +137,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'Hermes was the swift messenger of the gods, patron of travel, trade, boundaries, and cunning. He linked divine speech to movement and exchange.',
     archaeology:
       'Archaeological traces of Hermes connect to travel culture, devotional objects, and the material world of trade routes and border crossings.',
+    archaeologicalCaption: 'Archaeological object description pending.',
     archaeologicalImage: hermesLoreImage,
   },
   ulfsark: {
@@ -135,6 +147,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'The úlfhéðnar were warriors of Odin, associated with wolves and battle frenzy. The wolf was a symbol of ferocity, loyalty, and ecstatic combat.',
     archaeology:
       'Norse warrior culture is reconstructed through burial remains, grave goods, and symbolic objects tied to martial identity and sacred violence.',
+    archaeologicalCaption: 'Archaeological object description pending.',
     archaeologicalImage: ulfsarkLoreImage,
   },
   freya: {
@@ -144,6 +157,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'Freya was a powerful goddess of love, magic, fertility, and battle. She ruled over the hall of the fallen and embodied both tenderness and fierce power.',
     archaeology:
       'Freya’s image is understood through Norse femininity, ritual symbolism, and the cultural memory of goddesses associated with erotic power and martial glory.',
+    archaeologicalCaption: 'Archaeological object description pending.',
     archaeologicalImage: freyaLoreImage,
   },
   'frost-giant': {
@@ -153,6 +167,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'The jötnar were primordial beings of ice, wilderness, and cosmic force, often in opposition to the gods and representing the wild world beyond order.',
     archaeology:
       'Frost giant imagery is connected to the mythic geography of northern landscapes, where terrifying natural forces were folded into sacred narrative.',
+    archaeologicalCaption: 'Archaeological object description pending.',
     archaeologicalImage: frostGiantLoreImage,
   },
   hela: {
@@ -162,6 +177,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'Hel was the ruler of the realm of the dead for those who did not die gloriously in battle. Her dominion was cold, hidden, and final.',
     archaeology:
       'Hel’s presence is read through funerary symbolism, the realm of the dead, and the Norse understanding of death as a realm with its own order.',
+    archaeologicalCaption: 'Archaeological object description pending.',
     archaeologicalImage: helaLoreImage,
   },
   loki: {
@@ -171,6 +187,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'Loki was a shape-shifting trickster, master of misdirection and chaos. He was both companion and adversary to the gods, and a source of instability in the cosmos.',
     archaeology:
       'Loki’s mythic identity is read through the tension between order and disorder, deception and consequence, and the wild energies of the Norse world.',
+    archaeologicalCaption: 'Archaeological object description pending.',
     archaeologicalImage: lokiLoreImage,
   },
   skadi: {
@@ -180,6 +197,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'Skadi was a goddess of winter, mountains, hunting, and fierce independence. She represented the harsh beauty of the northern wilds.',
     archaeology:
       'Skadi’s symbolic field sits within the material culture of northern landscapes, where hunting, winter, terrain, and sacred power are tightly intertwined.',
+    archaeologicalCaption: 'Archaeological object description pending.',
     archaeologicalImage: skadiLoreImage,
   },
   odin: {
@@ -189,6 +207,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'Odin was the all-father of the Norse gods, associated with wisdom, sacrifice, magic, and the relentless pursuit of knowledge.',
     archaeology:
       'The archaeology of Odin is inseparable from the cult of the warrior dead, the sacred wisdom of runes, and the memorial landscape of the Norse world.',
+    archaeologicalCaption: 'Archaeological object description pending.',
     archaeologicalImage: odinLoreImage,
   },
   valkyrie: {
@@ -198,6 +217,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'The valkyries were divine choosers of the slain, selecting warriors for Valhalla and carrying the dead to the halls of the honored.',
     archaeology:
       'The valkyrie motif appears in Norse art and narrative as an emblem of martial destiny, death, and heroic transcendence.',
+    archaeologicalCaption: 'Archaeological object description pending.',
     archaeologicalImage: valkyrieLoreImage,
   },
   forseti: {
@@ -207,6 +227,7 @@ export const loreEntriesEN: Record<string, LoreText> = {
       'Forseti was the god of truth, justice, and settlement, often associated with fairness, mediation, and the making of peace after conflict.',
     archaeology:
       'Forseti is understood less through battlefield iconography than through the legal and symbolic order of Norse society and the ethics of judgment.',
+    archaeologicalCaption: 'Archaeological object description pending.',
     archaeologicalImage: forsetiLoreImage,
   },
 };

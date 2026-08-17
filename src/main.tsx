@@ -43,6 +43,7 @@ type LoreEntry = {
   subtitle: { EN: string; ES: string };
   mythology: { EN: string; ES: string };
   archaeology: { EN: string; ES: string };
+  archaeologicalCaption: { EN: string; ES: string };
   archaeologicalImage?: string;
   artifact?: {
     name?: { EN: string; ES: string };
@@ -109,6 +110,10 @@ const LORE_ENTRIES: Partial<Record<string, LoreEntry>> = Object.fromEntries(
         archaeology: {
           EN: enEntry?.archaeology ?? '',
           ES: esEntry?.archaeology ?? '',
+        },
+        archaeologicalCaption: {
+          EN: enEntry?.archaeologicalCaption ?? 'Archaeological object description pending.',
+          ES: esEntry?.archaeologicalCaption ?? 'Descripción de la pieza arqueológica pendiente.',
         },
         archaeologicalImage: enEntry?.archaeologicalImage ?? esEntry?.archaeologicalImage,
       },
@@ -1434,6 +1439,26 @@ const displayedThorWarrior =
                   gameMode === 'LOCAL' || !thinking
                     ? 'status-warrior-human'
                     : ''
+                } ${
+                  (
+                    gameMode === 'LOCAL'
+                      ? (turn === 'X' ? ZEUS : THOR)
+                      : thinking
+                        ? computerArmy
+                        : humanArmy
+                  ) === humanArmy
+                    ? 'side-left'
+                    : 'side-right'
+                } ${
+                  (
+                    gameMode === 'LOCAL'
+                      ? (turn === 'X' ? ZEUS : THOR)
+                      : thinking
+                        ? computerArmy
+                        : humanArmy
+                  ) === ZEUS
+                    ? 'army-zeus'
+                    : 'army-thor'
                 }`}
               src={
                   gameMode === 'LOCAL'
@@ -1999,6 +2024,12 @@ const displayedThorWarrior =
                 <img
                   className={`warrior-modal-image ${
                     !previewUnlocked ? 'locked' : ''
+                  } ${
+                    selectorArmy === humanArmy
+                      ? 'side-left'
+                      : 'side-right'
+                  } ${
+                    selectorArmy === ZEUS ? 'army-zeus' : 'army-thor'
                   }`}
                   src={previewWarrior.image}
                   alt={previewWarrior.name}
@@ -2180,7 +2211,13 @@ const displayedThorWarrior =
                           ? <img src={loreEntry.archaeologicalImage} alt="" />
                           : <div className="codex-placeholder"><span>🏺</span><strong>{t.archaeologicalObject}</strong><small>{loreUnlocked ? t.comingSoon : (language === 'ES' ? 'CONTENIDO BLOQUEADO' : 'CONTENT LOCKED')}</small></div>}
                       </div>
-                      <figcaption>{t.archaeology}</figcaption>
+                      <figcaption className="codex-artifact-caption">
+                        {loreUnlocked
+                          ? loreEntry?.archaeologicalCaption[language]
+                          : (language === 'ES'
+                              ? 'Juega para desbloquear la información de esta pieza.'
+                              : 'Play to unlock information about this object.')}
+                      </figcaption>
                     </figure>
                   </div>
 
