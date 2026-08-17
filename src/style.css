@@ -2083,3 +2083,102 @@ main {
 @media (max-width:600px) {
   .codex-pantheon-switcher button { min-height:31px; }
 }
+
+
+/* =========================================================
+   PLAYER PERSPECTIVE — human faction is always LEFT
+   ========================================================= */
+.score.score-player-side { left: 27%; }
+.score.score-enemy-side { left: 73%; }
+
+.battle-warriors > .battle-warrior-card.zeus { grid-column: 1; grid-row: 1; }
+.battle-warriors > .battle-warriors-vs { grid-column: 2; grid-row: 1; }
+.battle-warriors > .battle-warrior-card.thor { grid-column: 3; grid-row: 1; }
+
+.battle-warriors.human-thor > .battle-warrior-card.thor { grid-column: 1; }
+.battle-warriors.human-thor > .battle-warrior-card.zeus { grid-column: 3; }
+
+/* Left card artwork points inward. */
+.battle-warriors.human-zeus .battle-warrior-card.zeus,
+.battle-warriors.human-thor .battle-warrior-card.thor {
+  grid-template-columns: minmax(0, 1fr) 42px;
+}
+.battle-warriors.human-zeus .battle-warrior-card.zeus img,
+.battle-warriors.human-thor .battle-warrior-card.thor img {
+  grid-column: 2;
+}
+.battle-warriors.human-zeus .battle-warrior-card.zeus .battle-warrior-role,
+.battle-warriors.human-zeus .battle-warrior-card.zeus .battle-warrior-name,
+.battle-warriors.human-zeus .battle-warrior-card.zeus strong,
+.battle-warriors.human-thor .battle-warrior-card.thor .battle-warrior-role,
+.battle-warriors.human-thor .battle-warrior-card.thor .battle-warrior-name,
+.battle-warriors.human-thor .battle-warrior-card.thor strong {
+  grid-column: 1;
+  text-align: right;
+}
+
+/* Greek card on the right returns to image-left/text-right. */
+.battle-warriors.human-thor .battle-warrior-card.zeus {
+  grid-template-columns: 42px minmax(0, 1fr);
+}
+.battle-warriors.human-thor .battle-warrior-card.zeus img { grid-column: 1; }
+.battle-warriors.human-thor .battle-warrior-card.zeus .battle-warrior-role,
+.battle-warriors.human-thor .battle-warrior-card.zeus .battle-warrior-name,
+.battle-warriors.human-thor .battle-warrior-card.zeus strong {
+  grid-column: 2;
+  text-align: left;
+}
+
+/* NEW stays on the outside edge. */
+.battle-warriors.human-zeus .battle-warrior-card.zeus .battle-warrior-new,
+.battle-warriors.human-thor .battle-warrior-card.thor .battle-warrior-new {
+  left: 6px;
+  right: auto;
+}
+.battle-warriors.human-zeus .battle-warrior-card.thor .battle-warrior-new,
+.battle-warriors.human-thor .battle-warrior-card.zeus .battle-warrior-new {
+  right: 6px;
+  left: auto;
+}
+
+.current-side-quick.on-player { left: 7px; right: auto; }
+.random-rival-quick.on-enemy { right: -7px; left: auto; }
+
+/* Wrapper flips pieces without overriding existing image animations. */
+.piece-facing {
+  position: relative;
+  z-index: 2;
+  width: 120%;
+  height: 120%;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.piece-facing .piece-image {
+  width: 100%;
+  height: 100%;
+}
+/* Los PNG originales están orientados para la perspectiva Grecia-izquierda.
+   Cuando el jugador elige Nórdicos, TODO el campo cambia de perspectiva:
+   nórdicos pasan a mirar a la derecha y griegos a la izquierda. */
+.piece-perspective-zeus { transform: scaleX(1); }
+.piece-perspective-thor { transform: scaleX(-1); }
+
+/* Lo mismo para las miniaturas de las cards: al intercambiar los bandos,
+   ambos personajes se voltean para seguir mirándose hacia el VS. */
+.battle-warriors.human-thor .battle-warrior-card.thor img,
+.battle-warriors.human-thor .battle-warrior-card.zeus img {
+  transform: scaleX(-1);
+}
+
+@media (max-width: 380px) {
+  .battle-warriors.human-zeus .battle-warrior-card.zeus,
+  .battle-warriors.human-thor .battle-warrior-card.thor {
+    grid-template-columns: minmax(0, 1fr) 38px;
+  }
+  .battle-warriors.human-thor .battle-warrior-card.zeus {
+    grid-template-columns: 38px minmax(0, 1fr);
+  }
+  .random-rival-quick.on-enemy { right: -4px; left: auto; }
+  .current-side-quick.on-player { left: 4px; right: auto; }
+}

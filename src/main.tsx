@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './style.css';
 import boardImage from './assets/boards/board.png';
+import boardThorImage from './assets/boards/board-thor.png';
 
 import victorySound from './assets/sounds/victory.mp3';
 import defeatSound from './assets/sounds/defeat.mp3';
@@ -1376,7 +1377,7 @@ const displayedThorWarrior =
       <section className="scene" aria-label="Tablero mitológico Zeus contra Thor">
         <img
           className="scene-image"
-          src={boardImage}
+          src={humanArmy === ZEUS ? boardImage : boardThorImage}
           alt="Escenario mitológico de Zeus contra Thor"
         />
 
@@ -1489,7 +1490,11 @@ const displayedThorWarrior =
           </button>
         </div>
 
-        <div className={`battle-warriors ${battleStarted ? 'locked' : ''}`}>
+        <div
+          className={`battle-warriors ${
+            humanArmy === THOR ? 'human-thor' : 'human-zeus'
+          } ${battleStarted ? 'locked' : ''}`}
+        >
           <button
             className={`battle-warrior-card zeus ${humanArmy === ZEUS ? 'human' : 'enemy'}`}
             onClick={() => openWarriorSelector(ZEUS)}
@@ -1519,8 +1524,8 @@ const displayedThorWarrior =
 
           {gameMode === 'CPU' && (
             <div
-              className={`current-side-quick ${
-                humanArmy === ZEUS ? 'on-zeus zeus' : 'on-thor thor'
+              className={`current-side-quick on-player ${
+                humanArmy === ZEUS ? 'zeus' : 'thor'
               }`}
               aria-label={
                 humanArmy === ZEUS
@@ -1544,9 +1549,7 @@ const displayedThorWarrior =
               type="button"
               className={`random-rival-quick ${
                 randomRival ? 'active' : 'inactive'
-              } ${
-                computerArmy === ZEUS ? 'on-zeus' : 'on-thor'
-              }`}
+              } on-enemy`}
               onClick={toggleRandomRival}
               disabled={battleStarted}
               aria-label={
@@ -1587,7 +1590,11 @@ const displayedThorWarrior =
           </button>
         </div>
 
-        <div className={`score score-zeus ${battleStarted ? 'score-hidden' : ''}`}>
+        <div
+          className={`score score-zeus ${
+            humanArmy === ZEUS ? 'score-player-side' : 'score-enemy-side'
+          } ${battleStarted ? 'score-hidden' : ''}`}
+        >
           {zeusScore}
         </div>
 
@@ -1595,7 +1602,11 @@ const displayedThorWarrior =
           {drawScore}
         </div>
 
-        <div className={`score score-thor ${battleStarted ? 'score-hidden' : ''}`}>
+        <div
+          className={`score score-thor ${
+            humanArmy === THOR ? 'score-player-side' : 'score-enemy-side'
+          } ${battleStarted ? 'score-hidden' : ''}`}
+        >
           {thorScore}
         </div>
 
@@ -1658,19 +1669,26 @@ const displayedThorWarrior =
                       {value}
                     </span>
 
-                    <img
-                      className={`
-                        piece-image
-                        piece-enter
-                        ${value === humanMark ? 'human-piece' : ''}
-                        ${winningLine?.includes(index)
-                          ? pieceArmy === ZEUS
-                            ? 'winner-zeus'
-                            : 'winner-thor'
-                          : ''
-                        }
-                      `}
-                      src={
+                    <span
+                      className={`piece-facing ${
+                        humanArmy === THOR
+                          ? 'piece-perspective-thor'
+                          : 'piece-perspective-zeus'
+                      }`}
+                    >
+                      <img
+                        className={`
+                          piece-image
+                          piece-enter
+                          ${value === humanMark ? 'human-piece' : ''}
+                          ${winningLine?.includes(index)
+                            ? pieceArmy === ZEUS
+                              ? 'winner-zeus'
+                              : 'winner-thor'
+                            : ''
+                          }
+                        `}
+                        src={
                           gameMode === 'CPU' &&
                           randomRival &&
                           pieceArmy === computerArmy &&
@@ -1690,7 +1708,8 @@ const displayedThorWarrior =
                               ? equippedZeusWarrior.name
                               : equippedThorWarrior.name
                         }
-                    />
+                      />
+                    </span>
                   </>
                 )}
               </button>
