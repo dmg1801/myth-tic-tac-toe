@@ -347,6 +347,11 @@ main {
   text-align: right;
 }
 
+.battle-warrior-card.zeus .battle-warrior-new {
+  left: 6px;
+  right: auto;
+}
+
 .battle-warrior-card.human {
   box-shadow: inset 0 0 15px rgba(255,255,255,.04), 0 0 9px rgba(255,255,255,.06);
 }
@@ -391,6 +396,11 @@ main {
 
 .battle-warrior-card.zeus .battle-warrior-name { color: #f2c35c; }
 .battle-warrior-card.thor .battle-warrior-name { color: #9ed8ff; }
+
+.battle-warrior-card.thor .battle-warrior-new {
+  right: 6px;
+  left: auto;
+}
 
 .battle-warrior-card strong {
   grid-column: 2;
