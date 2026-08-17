@@ -2,52 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './style.css';
 import boardImage from './assets/boards/board.png';
-import player1Image from './assets/players/hoplita.png';
-import player2Image from './assets/players/ulfsark.png';
 
-import athenaImage from './assets/players/athena.png';
-import minotaurImage from './assets/players/minotaur.png';
-import hadesImage from './assets/players/hades.png';
-import zeusImage from './assets/players/zeus.png';
-
-import freyaImage from './assets/players/freya.png';
-import frostGiantImage from './assets/players/frost-giant.png';
-import helaImage from './assets/players/hela.png';
-import thorImage from './assets/players/thor.png';
-
-import forsetiImage from './assets/players/forseti.png';
-import lokiImage from './assets/players/loki.png';
-import odinImage from './assets/players/odin.png';
-import skadiImage from './assets/players/skadi.png';
-import valkyrieImage from './assets/players/valkiria.png';
-
-import aphroditeImage from './assets/players/afrodita.png';
-import poseidonImage from './assets/players/poseidon.png';
-import demeterImage from './assets/players/demeter.png';
-import hermesImage from './assets/players/hermes.png';
-import hestaImage from './assets/players/hestia.png';
-
-import hopliteSound from './assets/sounds/hoplite.mp3';
-import ulfsarkSound from './assets/sounds/ulfsark.mp3';
 import victorySound from './assets/sounds/victory.mp3';
-import athenaSound from './assets/sounds/athena.mp3';
-import minotaurSound from './assets/sounds/minotaur.mp3';
-import hadesSound from './assets/sounds/hades.mp3';
-import zeusSound from './assets/sounds/zeus.mp3';
-import frostGiantSound from './assets/sounds/frost-giant.mp3';
-import helSound from './assets/sounds/hel.mp3';
-import thorSound from './assets/sounds/thor.mp3';
-import freyaSound from './assets/sounds/freya.mp3';
-import aphroditeSound from './assets/sounds/afrodita.mp3';
-import demeterSound from './assets/sounds/demeter.mp3';
-import hermesSound from './assets/sounds/hermes.mp3';
-import hestaSound from './assets/sounds/hestia.mp3';
-import poseidonSound from './assets/sounds/poseidon.mp3';
-import lokiSound from './assets/sounds/loki.mp3';
-import skadiSound from './assets/sounds/skadi.mp3';
-import odinSound from './assets/sounds/odin.mp3';
-import valkyrieSound from './assets/sounds/valkiria.mp3';
-import forsetiSound from './assets/sounds/forseti.mp3';
 import defeatSound from './assets/sounds/defeat.mp3';
 import drawSound from './assets/sounds/draw.mp3';
 import ambienceSound from './assets/sounds/ambience.mp3';
