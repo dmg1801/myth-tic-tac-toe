@@ -2010,3 +2010,76 @@ main {
   .museum-quick-icon { font-size: 11px; }
   .museum-quick-new { font-size: 4.5px; padding: 2px 3px; }
 }
+
+
+/* ===== MUSEUM · LOCKED PREVIEWS + PANTHEON SWITCHING ===== */
+.codex-pantheon-switcher {
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:8px;
+  margin:-7px 0 14px;
+}
+.codex-pantheon-switcher button {
+  min-height:29px;
+  padding:5px 10px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:999px;
+  background:rgba(255,255,255,.035);
+  color:rgba(255,255,255,.68);
+  font-size:6.5px;
+  font-weight:1000;
+  letter-spacing:.65px;
+  cursor:pointer;
+}
+.codex-pantheon-switcher button:first-child { justify-self:start; }
+.codex-pantheon-switcher button:last-child { justify-self:end; }
+.codex-pantheon-switcher > span {
+  color:rgba(255,255,255,.55);
+  font-size:14px;
+}
+
+/* Locked entries remain visible and clickable: teaser, not dead content. */
+.codex-entry.locked {
+  opacity:.72;
+  filter:none;
+  cursor:pointer;
+}
+.codex-entry-image { position:relative; }
+.codex-entry-image img.locked {
+  filter:brightness(.12) grayscale(1) contrast(1.15);
+  opacity:.72;
+}
+.codex-entry-lock {
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  font-size:18px;
+  filter:none;
+  pointer-events:none;
+}
+.codex-entry.locked .codex-entry-text strong { color:rgba(244,234,213,.72); }
+.codex-entry.locked .codex-entry-arrow { opacity:.5; }
+
+/* Locked character detail: silhouette + lock, no archaeological reveal. */
+.codex-play-warrior.locked {
+  cursor:default;
+}
+.codex-play-warrior img.locked {
+  filter:brightness(.10) grayscale(1) contrast(1.2);
+  opacity:.72;
+}
+.codex-detail-lock {
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  z-index:2;
+  font-size:32px;
+  pointer-events:none;
+}
+
+@media (max-width:600px) {
+  .codex-pantheon-switcher button { min-height:31px; }
+}

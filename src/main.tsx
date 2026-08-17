@@ -519,6 +519,7 @@ const [selectedThorWarrior, setSelectedThorWarrior] = useState(() =>
   const codexWins = codexArmy === ZEUS ? zeusTotalWins : thorTotalWins;
   const loreWarrior = codexWarriors.find(w => w.id === selectedLoreWarriorId) ?? null;
   const loreEntry = loreWarrior ? LORE_ENTRIES[loreWarrior.id] : undefined;
+  const loreUnlocked = loreWarrior ? codexWins >= loreWarrior.unlockAt : false;
 
 
   const winner = getWinner(board);
@@ -1021,37 +1022,64 @@ function nextWarrior() {
   function openPreviewLore() {
     if (!previewUnlocked) return;
     setCodexArmy(selectorArmy);
-    openLoreWarrior(previewWarrior);
+    openLoreWarrior(previewWarrior, selectorArmy);
     setCodexReturnToRoster(true);
     setShowWarriorSelector(false);
     setShowCodex(true);
     playSound(pageSound, AUDIO_VOLUME.page);
   }
 
-  function openLoreWarrior(warrior: Warrior) {
+  function isWarriorUnlocked(army: Army, warrior: Warrior) {
+    const wins = army === ZEUS ? zeusTotalWins : thorTotalWins;
+    return wins >= warrior.unlockAt;
+  }
+
+  function openLoreWarrior(warrior: Warrior, army: Army = codexArmy) {
+    const unlocked = isWarriorUnlocked(army, warrior);
+
+    setCodexArmy(army);
     setSelectedLoreWarriorId(warrior.id);
 
-    setMuseumViewedWarriors(current => {
-      if (current.includes(warrior.id)) return current;
-      const next = [...current, warrior.id];
-      localStorage.setItem(MUSEUM_VIEWED_STORAGE_KEY, JSON.stringify(next));
-      return next;
-    });
+    // Un personaje bloqueado puede explorarse, pero no cuenta como contenido visto.
+    if (unlocked) {
+      setMuseumViewedWarriors(current => {
+        if (current.includes(warrior.id)) return current;
+        const next = [...current, warrior.id];
+        localStorage.setItem(MUSEUM_VIEWED_STORAGE_KEY, JSON.stringify(next));
+        return next;
+      });
 
-    playSound(warrior.sound, AUDIO_VOLUME.selection);
+      playSound(warrior.sound, AUDIO_VOLUME.selection);
+    } else {
+      playSound(pageSound, AUDIO_VOLUME.page);
+    }
+  }
+
+  function switchCodexPantheon(army: Army) {
+    if (army === codexArmy) return;
+    setCodexArmy(army);
+    setSelectedLoreWarriorId(null);
+    playSound(pageSound, AUDIO_VOLUME.page);
   }
 
   function moveLore(direction: -1 | 1) {
     if (!loreWarrior) return;
 
-    const unlocked = codexWarriors.filter(warrior => codexWins >= warrior.unlockAt);
-    const currentIndex = unlocked.findIndex(warrior => warrior.id === loreWarrior.id);
+    const allLoreWarriors = [
+      ...ZEUS_WARRIORS.map(warrior => ({ army: ZEUS as Army, warrior })),
+      ...THOR_WARRIORS.map(warrior => ({ army: THOR as Army, warrior })),
+    ];
+
+    const currentIndex = allLoreWarriors.findIndex(
+      item => item.army === codexArmy && item.warrior.id === loreWarrior.id
+    );
     if (currentIndex === -1) return;
 
-    const nextIndex = currentIndex + direction;
-    if (nextIndex < 0 || nextIndex >= unlocked.length) return;
+    const nextIndex =
+      (currentIndex + direction + allLoreWarriors.length) % allLoreWarriors.length;
+    const next = allLoreWarriors[nextIndex];
 
-    openLoreWarrior(unlocked[nextIndex]);
+    openLoreWarrior(next.warrior, next.army);
   }
 
   function closeCodex() {
@@ -2128,7 +2156,6 @@ const displayedThorWarrior =
                     <button
                       type="button"
                       onClick={() => moveLore(-1)}
-                      disabled={codexWarriors.filter(w => codexWins >= w.unlockAt).findIndex(w => w.id === loreWarrior.id) <= 0}
                     >
                       ‹ {language === 'ES' ? 'ANTERIOR' : 'PREVIOUS'}
                     </button>
@@ -2136,7 +2163,6 @@ const displayedThorWarrior =
                     <button
                       type="button"
                       onClick={() => moveLore(1)}
-                      disabled={codexWarriors.filter(w => codexWins >= w.unlockAt).findIndex(w => w.id === loreWarrior.id) >= codexWarriors.filter(w => codexWins >= w.unlockAt).length - 1}
                     >
                       {language === 'ES' ? 'SIGUIENTE' : 'NEXT'} ›
                     </button>
@@ -2146,8 +2172,9 @@ const displayedThorWarrior =
                     <figure>
                       <button
                         type="button"
-                        className="codex-image-box game-art codex-play-warrior"
-                        onClick={openWarriorFromMuseum}
+                        className={`codex-image-box game-art codex-play-warrior ${!loreUnlocked ? 'locked' : ''}`}
+                        onClick={() => loreUnlocked && openWarriorFromMuseum()}
+                        disabled={!loreUnlocked}
                         aria-label={
                           language === 'ES'
                             ? `Jugar con ${warriorText(loreWarrior).name}`
@@ -2155,23 +2182,28 @@ const displayedThorWarrior =
                         }
                       >
                         <img
+                          className={!loreUnlocked ? 'locked' : ''}
                           src={loreWarrior.image}
                           alt={warriorText(loreWarrior).name}
                         />
 
-                        <span className="codex-play-warrior-label">
-                          {language === 'ES'
-                            ? 'JUGAR CON ESTE PERSONAJE ›'
-                            : 'PLAY AS THIS WARRIOR ›'}
-                        </span>
+                        {!loreUnlocked && <span className="codex-detail-lock">🔒</span>}
+
+                        {loreUnlocked && (
+                          <span className="codex-play-warrior-label">
+                            {language === 'ES'
+                              ? 'JUGAR CON ESTE PERSONAJE ›'
+                              : 'PLAY AS THIS WARRIOR ›'}
+                          </span>
+                        )}
                       </button>
                       <figcaption>{t.gameArt}</figcaption>
                     </figure>
                     <figure>
                       <div className="codex-image-box">
-                        {loreEntry?.archaeologicalImage
+                        {loreUnlocked && loreEntry?.archaeologicalImage
                           ? <img src={loreEntry.archaeologicalImage} alt="" />
-                          : <div className="codex-placeholder"><span>🏺</span><strong>{t.archaeologicalObject}</strong><small>{t.comingSoon}</small></div>}
+                          : <div className="codex-placeholder"><span>🏺</span><strong>{t.archaeologicalObject}</strong><small>{loreUnlocked ? t.comingSoon : (language === 'ES' ? 'CONTENIDO BLOQUEADO' : 'CONTENT LOCKED')}</small></div>}
                       </div>
                       <figcaption>{t.archaeology}</figcaption>
                     </figure>
@@ -2179,16 +2211,24 @@ const displayedThorWarrior =
 
                   <section className="codex-copy">
                     <h2>{t.mythologyHistory}</h2>
-                    <p>{loreEntry?.mythology[language] ?? (language === 'ES'
-                      ? `La ficha completa de ${loreWarrior.name} se incorporará próximamente.`
-                      : `The complete ${loreWarrior.name} entry will be added soon.`)}</p>
+                    <p>{loreUnlocked
+                      ? (loreEntry?.mythology[language] ?? (language === 'ES'
+                          ? `La ficha completa de ${loreWarrior.name} se incorporará próximamente.`
+                          : `The complete ${loreWarrior.name} entry will be added soon.`))
+                      : (language === 'ES'
+                          ? `🔒 Juega para desbloquear el contenido de esta sección. Requiere ${loreWarrior.unlockAt} GLORY · ${codexWins}/${loreWarrior.unlockAt}.`
+                          : `🔒 Play to unlock the content of this section. Requires ${loreWarrior.unlockAt} GLORY · ${codexWins}/${loreWarrior.unlockAt}.`)}</p>
                   </section>
 
                   <section className="codex-copy archaeology">
                     <h2>{t.archaeologicalContext}</h2>
-                    <p>{loreEntry?.archaeology[language] ?? (language === 'ES'
-                      ? 'La documentación arqueológica de esta figura se incorporará próximamente.'
-                      : 'Archaeological documentation for this figure will be added soon.')}</p>
+                    <p>{loreUnlocked
+                      ? (loreEntry?.archaeology[language] ?? (language === 'ES'
+                          ? 'La documentación arqueológica de esta figura se incorporará próximamente.'
+                          : 'Archaeological documentation for this figure will be added soon.'))
+                      : (language === 'ES'
+                          ? `🔒 Juega para desbloquear el contenido de esta sección. Requiere ${loreWarrior.unlockAt} GLORY · ${codexWins}/${loreWarrior.unlockAt}.`
+                          : `🔒 Play to unlock the content of this section. Requires ${loreWarrior.unlockAt} GLORY · ${codexWins}/${loreWarrior.unlockAt}.`)}</p>
                   </section>
                 </article>
               ) : (
@@ -2200,19 +2240,32 @@ const displayedThorWarrior =
                       : (language === 'ES' ? 'PANTEÓN NÓRDICO' : 'NORSE PANTHEON')}</h1>
                     <p>{t.playUnlockDiscover}</p>
                   </header>
+
+                  <div className="codex-pantheon-switcher">
+                    <button type="button" onClick={() => switchCodexPantheon(codexArmy === ZEUS ? THOR : ZEUS)}>
+                      ‹ {codexArmy === ZEUS ? (language === 'ES' ? 'NÓRDICO' : 'NORSE') : (language === 'ES' ? 'GRIEGO' : 'GREEK')}
+                    </button>
+                    <span>{codexArmy === ZEUS ? '⚡' : '🔨'}</span>
+                    <button type="button" onClick={() => switchCodexPantheon(codexArmy === ZEUS ? THOR : ZEUS)}>
+                      {codexArmy === ZEUS ? (language === 'ES' ? 'NÓRDICO' : 'NORSE') : (language === 'ES' ? 'GRIEGO' : 'GREEK')} ›
+                    </button>
+                  </div>
+
                   <div className="codex-list">
                     {codexWarriors.map((warrior, index) => {
                       const unlocked = codexWins >= warrior.unlockAt;
                       return (
                         <button key={warrior.id} type="button"
                           className={`codex-entry ${unlocked ? 'unlocked' : 'locked'}`}
-                          disabled={!unlocked}
-                          onClick={() => unlocked && openLoreWarrior(warrior)}>
+                          onClick={() => openLoreWarrior(warrior)}>
                           <span className="codex-entry-number">{String(index + 1).padStart(2, '0')}</span>
-                          <span className="codex-entry-image">{unlocked ? <img src={warrior.image} alt="" /> : '🔒'}</span>
+                          <span className="codex-entry-image">
+                            <img className={!unlocked ? 'locked' : ''} src={warrior.image} alt="" />
+                            {!unlocked && <span className="codex-entry-lock">🔒</span>}
+                          </span>
                           <span className="codex-entry-text">
                             <strong>
-                              {unlocked ? warriorText(warrior).name : t.locked}
+                              {warriorText(warrior).name}
                               {unlocked && museumNewWarriorIds.includes(warrior.id) && (
                                 <span className="codex-entry-new">
                                   {language === 'ES' ? 'NUEVO' : 'NEW'}
@@ -2221,9 +2274,9 @@ const displayedThorWarrior =
                             </strong>
                             <small>{unlocked
                               ? t.viewHistory
-                              : `${warrior.unlockAt} ${t.glory}`}</small>
+                              : `🔒 ${warrior.unlockAt} ${t.glory} · ${codexWins}/${warrior.unlockAt}`}</small>
                           </span>
-                          {unlocked && <span className="codex-entry-arrow">›</span>}
+                          <span className="codex-entry-arrow">›</span>
                         </button>
                       );
                     })}
