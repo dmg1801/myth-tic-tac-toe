@@ -1,1 +1,21 @@
-{"scripts":{"dev":"vite","build":"vite build","preview":"vite preview"},"dependencies":{"@vitejs/plugin-react":"latest","vite":"latest","typescript":"latest","react":"latest","react-dom":"latest"},"devDependencies":{}}
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "vite": "latest",
+    "typescript": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {},
+  "name": "zeus-vs-thor-mythic-tic-tac-toe",
+  "version": "6.0.0",
+  "private": true,
+  "description": "A mythological Tic-Tac-Toe battle with unlockable Greek and Norse characters and an integrated history, mythology and archaeology museum.",
+  "author": "Diego Mongay González",
+  "license": "UNLICENSED"
+}
