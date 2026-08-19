@@ -7,6 +7,7 @@ import hestaImage from '../../assets/players/hestia.png';
 import minotaurImage from '../../assets/players/minotaur.png';
 import poseidonImage from '../../assets/players/poseidon.png';
 import zeusImage from '../../assets/players/zeus.png';
+import gozdeImage from '../../assets/players/gozde.png';
 
 import athenaSound from '../../assets/sounds/athena.mp3';
 import aphroditeSound from '../../assets/sounds/afrodita.mp3';
@@ -17,6 +18,7 @@ import hestaSound from '../../assets/sounds/hestia.mp3';
 import minotaurSound from '../../assets/sounds/minotaur.mp3';
 import poseidonSound from '../../assets/sounds/poseidon.mp3';
 import zeusSound from '../../assets/sounds/zeus.mp3';
+import gozdeSound from '../../assets/sounds/gozde.mp3';
 import hopliteSound from '../../assets/sounds/hoplite.mp3';
 import player1Image from '../../assets/players/hoplita.png';
 
@@ -103,6 +105,15 @@ export const ZEUS_WARRIORS: Warrior[] = [
     unlockAt: 16,
     image: hermesImage,
     sound: hermesSound,
+  },
+  {
+    id: 'gozde',
+    name: 'GÖZDE',
+    title: 'THE FIRE ARCHER',
+    description: 'A secret archer of the Turkish pantheon, swift and precise, dressed in black and revealed only to those who know her name.',
+    unlockAt: 0,
+    image: gozdeImage,
+    sound: gozdeSound,
   },
   {
     id: 'zeus',

@@ -37,6 +37,8 @@ const RANDOM_RIVAL_STORAGE_KEY = 'zeus-vs-thor-random-rival-v1';
 const ACKNOWLEDGED_WARRIORS_STORAGE_KEY = 'zeus-vs-thor-acknowledged-warriors-v2';
 const LANGUAGE_STORAGE_KEY = 'zeus-vs-thor-language-v1';
 const MUSEUM_VIEWED_STORAGE_KEY = 'zeus-vs-thor-museum-viewed-v1';
+const GOZDE_UNLOCK_STORAGE_KEY = 'zeus-vs-thor-secret-gozde-v1';
+const GOZDE_SECRET_CODE = 'GOZDE';
 
 type LoreEntry = {
   title: { EN: string; ES: string };
@@ -313,6 +315,15 @@ function loadLanguage(): Language {
   }
 }
 
+
+function loadGozdeUnlocked(): boolean {
+  try {
+    return localStorage.getItem(GOZDE_UNLOCK_STORAGE_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
 function App() {
   const [board, setBoard] = useState<Cell[]>(Array(9).fill(null));
   const [turn, setTurn] = useState<Player>('X');
@@ -342,6 +353,12 @@ function App() {
   const [drawScore, setDrawScore] = useState(0);
   const resultCounted = useRef(false);
 
+  // Easter egg permanente: Gözde no existe en el roster hasta descubrir su código.
+  const [gozdeUnlocked, setGozdeUnlocked] = useState<boolean>(() => loadGozdeUnlocked());
+  const zeusWarriors = ZEUS_WARRIORS.filter(
+    warrior => warrior.id !== 'gozde' || gozdeUnlocked
+  );
+
   // Progreso permanente: se conserva aunque cierres el navegador.
   const [glory, setGlory] = useState<GloryProgress>(() => loadGloryProgress());
   const [unlockNotice, setUnlockNotice] = useState<UnlockNotice>(null);
@@ -356,7 +373,7 @@ function App() {
 
  const [selectedZeusWarrior, setSelectedZeusWarrior] = useState(() =>
   loadSavedWarriorSelection(
-    ZEUS_WARRIORS,
+    zeusWarriors,
     glory.zeusWins,
     'zeus'
   )
@@ -414,10 +431,10 @@ const [selectedThorWarrior, setSelectedThorWarrior] = useState(() =>
   const zeusTotalWins = godMode ? 20 : glory.zeusWins;
   const thorTotalWins = godMode ? 20 : glory.thorWins;
 
-  const equippedZeusWarrior = ZEUS_WARRIORS[selectedZeusWarrior];
+  const equippedZeusWarrior = zeusWarriors[selectedZeusWarrior];
   const equippedThorWarrior = THOR_WARRIORS[selectedThorWarrior];
 
-  const newZeusWarriors = ZEUS_WARRIORS
+  const newZeusWarriors = zeusWarriors
     .map((warrior, index) => ({ warrior, index }))
     .filter(({ warrior, index }) =>
       index > 0 &&
@@ -436,7 +453,7 @@ const [selectedThorWarrior, setSelectedThorWarrior] = useState(() =>
     .map(({ index }) => index);
 
   const museumNewWarriorIds = [
-    ...ZEUS_WARRIORS.filter((warrior, index) =>
+    ...zeusWarriors.filter((warrior, index) =>
       index > 0 &&
       zeusTotalWins >= warrior.unlockAt &&
       !museumViewedWarriors.includes(warrior.id)
@@ -449,7 +466,7 @@ const [selectedThorWarrior, setSelectedThorWarrior] = useState(() =>
   ];
 
   const hasNewMuseumContent = museumNewWarriorIds.length > 0;
-  const hasNewGreekMuseumContent = ZEUS_WARRIORS.some(
+  const hasNewGreekMuseumContent = zeusWarriors.some(
   warrior => museumNewWarriorIds.includes(warrior.id)
   );
 
@@ -458,7 +475,7 @@ const [selectedThorWarrior, setSelectedThorWarrior] = useState(() =>
   );
 
   const unlockedWarrior = unlockNotice
-    ? (unlockNotice.army === ZEUS ? ZEUS_WARRIORS : THOR_WARRIORS)[unlockNotice.slot]
+    ? (unlockNotice.army === ZEUS ? zeusWarriors : THOR_WARRIORS)[unlockNotice.slot]
     : null;
 
   // Dos decisiones independientes:
@@ -470,14 +487,14 @@ const [selectedThorWarrior, setSelectedThorWarrior] = useState(() =>
   const computerArmy: Army = humanArmy === ZEUS ? THOR : ZEUS;
   const computerMark: Player = humanMark === 'X' ? 'O' : 'X';
 
-  const currentWarriors = selectorArmy === ZEUS ? ZEUS_WARRIORS : THOR_WARRIORS;
+  const currentWarriors = selectorArmy === ZEUS ? zeusWarriors : THOR_WARRIORS;
   const currentWins = selectorArmy === ZEUS ? zeusTotalWins : thorTotalWins;
   const equippedWarriorIndex = selectorArmy === ZEUS ? selectedZeusWarrior : selectedThorWarrior;
   const previewWarrior = currentWarriors[warriorPreviewIndex] ?? currentWarriors[0];
   const previewUnlocked = currentWins >= previewWarrior.unlockAt;
   const previewEquipped = equippedWarriorIndex === warriorPreviewIndex;
 
-  const codexWarriors = codexArmy === ZEUS ? ZEUS_WARRIORS : THOR_WARRIORS;
+  const codexWarriors = codexArmy === ZEUS ? zeusWarriors : THOR_WARRIORS;
   const codexWins = codexArmy === ZEUS ? zeusTotalWins : thorTotalWins;
   const loreWarrior = codexWarriors.find(w => w.id === selectedLoreWarriorId) ?? null;
   const loreEntry = loreWarrior ? LORE_ENTRIES[loreWarrior.id] : undefined;
@@ -571,7 +588,7 @@ const [selectedThorWarrior, setSelectedThorWarrior] = useState(() =>
 
     // ¿Esta victoria acaba de desbloquear un guerrero?
     const warriors =
-      defeatedArmy === ZEUS ? ZEUS_WARRIORS : THOR_WARRIORS;
+      defeatedArmy === ZEUS ? zeusWarriors : THOR_WARRIORS;
 
     const unlockIndex = warriors.findIndex(
       warrior => warrior.unlockAt === nextWins
@@ -855,7 +872,7 @@ function nextWarrior() {
     const currentSelection = saved
       ? JSON.parse(saved)
       : {
-          zeus: ZEUS_WARRIORS[0].id,
+          zeus: zeusWarriors[0].id,
           thor: THOR_WARRIORS[0].id,
         };
 
@@ -913,7 +930,7 @@ function nextWarrior() {
       const currentSelection = saved
         ? JSON.parse(saved)
         : {
-            zeus: ZEUS_WARRIORS[0].id,
+            zeus: zeusWarriors[0].id,
             thor: THOR_WARRIORS[0].id,
           };
 
@@ -961,7 +978,7 @@ function nextWarrior() {
   if (!loreWarrior) return;
 
   const warriors =
-    codexArmy === ZEUS ? ZEUS_WARRIORS : THOR_WARRIORS;
+    codexArmy === ZEUS ? zeusWarriors : THOR_WARRIORS;
 
   const warriorIndex = warriors.findIndex(
     warrior => warrior.id === loreWarrior.id
@@ -1028,7 +1045,7 @@ function nextWarrior() {
     if (!loreWarrior) return;
 
     const allLoreWarriors = [
-      ...ZEUS_WARRIORS.map(warrior => ({ army: ZEUS as Army, warrior })),
+      ...zeusWarriors.map(warrior => ({ army: ZEUS as Army, warrior })),
       ...THOR_WARRIORS.map(warrior => ({ army: THOR as Army, warrior })),
     ];
 
@@ -1092,6 +1109,8 @@ function nextWarrior() {
     setAcknowledgedWarriors({ zeus: [0], thor: [0] });
     localStorage.removeItem(ACKNOWLEDGED_WARRIORS_STORAGE_KEY);
     localStorage.removeItem(WARRIOR_SELECTION_STORAGE_KEY);
+    localStorage.removeItem(GOZDE_UNLOCK_STORAGE_KEY);
+    localStorage.removeItem(MUSEUM_VIEWED_STORAGE_KEY);
     playSound(soundForArmy(humanArmy), AUDIO_VOLUME.selection);
   }
 
@@ -1117,7 +1136,7 @@ function nextWarrior() {
 
     const warriors =
       computerArmy === ZEUS
-        ? ZEUS_WARRIORS
+        ? zeusWarriors
         : THOR_WARRIORS;
 
     const wins =
@@ -1210,7 +1229,7 @@ function nextWarrior() {
     if (!nextRandom && randomEnemyWarrior) {
       const warriors =
         computerArmy === ZEUS
-          ? ZEUS_WARRIORS
+          ? zeusWarriors
           : THOR_WARRIORS;
 
       const selectedIndex = warriors.findIndex(
@@ -1229,7 +1248,7 @@ function nextWarrior() {
           const currentSelection = saved
             ? JSON.parse(saved)
             : {
-                zeus: ZEUS_WARRIORS[0].id,
+                zeus: zeusWarriors[0].id,
                 thor: THOR_WARRIORS[0].id,
               };
 
@@ -1301,7 +1320,20 @@ function nextWarrior() {
   }
 
   function activateGodMode() {
-    if (godModeCode.trim().toUpperCase() !== GOD_MODE_CODE) {
+    const enteredCode = godModeCode.trim().toUpperCase();
+
+    // Secret character: this does NOT enable God Mode or alter GLORY.
+    if (enteredCode === GOZDE_SECRET_CODE) {
+      localStorage.setItem(GOZDE_UNLOCK_STORAGE_KEY, 'true');
+      setGozdeUnlocked(true);
+      setShowGodModeLogin(false);
+      setGodModeCode('');
+      setGodModeError(false);
+      playSound(victorySound, AUDIO_VOLUME.godMode);
+      return;
+    }
+
+    if (enteredCode !== GOD_MODE_CODE) {
       setGodModeError(true);
       playSound(pageSound, AUDIO_VOLUME.page);
       return;

@@ -59,6 +59,12 @@ export const warriorI18nEN: Record<string, WarriorLocaleText> = {
     description:
       'God of travel, communication, and thieves. Hermes is known for his speed and cunning.',
   },
+  gozde: {
+    name: 'GÖZDE',
+    title: 'THE FIRE ARCHER',
+    description:
+      'A secret archer of the Turkish pantheon, swift and precise, dressed in black and revealed only to those who know her name.',
+  },
   zeus: {
     name: 'ZEUS',
     title: 'KING OF THE GODS',

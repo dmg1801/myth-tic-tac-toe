@@ -59,6 +59,12 @@ export const warriorI18nES: Record<string, WarriorLocaleText> = {
     description:
       'Dios asociado con los viajeros, la comunicación, el comercio y los ladrones. Hermes es conocido por su velocidad y astucia.',
   },
+  gozde: {
+    name: 'GÖZDE',
+    title: 'LA ARQUERA DE FUEGO',
+    description:
+      'Una arquera secreta del panteón turco, rápida y precisa, vestida de negro y revelada únicamente a quienes conocen su nombre.',
+  },
   zeus: {
     name: 'ZEUS',
     title: 'REY DE LOS DIOSES',
