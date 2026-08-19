@@ -2226,3 +2226,422 @@ main {
   text-align: center;
   white-space: pre-line;
 }
+
+/* =========================================================
+   UI CLEANUP PASS — v6 visual refinement
+   Keeps layout/game mechanics intact; reduces "component UI"
+   noise in favor of a calmer game HUD + museum editorial feel.
+   ========================================================= */
+
+:root {
+  --ui-serif: Georgia, "Times New Roman", serif;
+  --ui-sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --ui-ink: #f2ede3;
+  --ui-muted: rgba(242,237,227,.58);
+  --ui-line: rgba(242,237,227,.16);
+  --ui-panel: rgba(8,10,13,.82);
+  --ui-gold: #e5c16d;
+  --ui-blue: #9bc8e5;
+}
+
+/* General controls: less glow, less pill language, crisper hierarchy */
+button { letter-spacing: .02em; }
+
+.scene {
+  border-radius: 10px;
+  box-shadow: 0 14px 38px rgba(0,0,0,.48);
+}
+
+.scene-title {
+  letter-spacing: .015em;
+  text-shadow: 0 2px 4px rgba(0,0,0,.9);
+}
+.title-zeus { text-shadow: 0 2px 3px rgba(0,0,0,.9); }
+.title-thor { text-shadow: 0 2px 3px rgba(0,0,0,.9); }
+
+.scene-status {
+  padding: 3px 10px;
+  border: 0;
+  border-radius: 3px;
+  background: rgba(5,7,10,.62);
+  font-size: clamp(11px,2.8vw,14px);
+  font-weight: 650;
+  letter-spacing: .07em;
+  box-shadow: none;
+}
+
+.music-button,
+.god-vase-button {
+  border-color: rgba(255,255,255,.18);
+  background: rgba(7,9,12,.72);
+  box-shadow: none;
+}
+
+.score {
+  border-width: 1px;
+  border-radius: 5px;
+  background: rgba(7,9,12,.74);
+  box-shadow: 0 3px 8px rgba(0,0,0,.42);
+  text-shadow: 0 2px 3px rgba(0,0,0,.85);
+}
+.score-zeus { border-color: rgba(229,193,109,.58); box-shadow: 0 3px 8px rgba(0,0,0,.42); }
+.score-thor { border-color: rgba(155,200,229,.58); box-shadow: 0 3px 8px rgba(0,0,0,.42); }
+.score-draw { border-color: rgba(255,255,255,.28); }
+
+/* Bottom selector becomes one HUD rail rather than four floating buttons */
+.player-selector {
+  gap: 3px;
+  padding: 5px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 6px;
+  background: rgba(7,9,12,.88);
+  box-shadow: 0 6px 18px rgba(0,0,0,.36);
+}
+.player-choice {
+  min-height: 30px;
+  padding: 5px 9px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  color: rgba(255,255,255,.56);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .025em;
+}
+.player-choice.selected.zeus {
+  color: var(--ui-gold);
+  border-color: var(--ui-gold);
+  background: rgba(229,193,109,.06);
+  box-shadow: none;
+}
+.player-choice.selected.thor {
+  color: var(--ui-blue);
+  border-color: var(--ui-blue);
+  background: rgba(155,200,229,.06);
+  box-shadow: none;
+}
+
+/* Warrior cards: flatter, more like a game roster HUD */
+.battle-warrior-card {
+  border-radius: 5px;
+  border-color: rgba(255,255,255,.13);
+  background: rgba(6,8,11,.78);
+  box-shadow: none;
+}
+.battle-warrior-card.zeus { border-color: rgba(229,193,109,.34); }
+.battle-warrior-card.thor { border-color: rgba(155,200,229,.34); }
+.battle-warrior-card.human { box-shadow: inset 0 -2px rgba(255,255,255,.08); }
+.battle-warrior-role,
+.battle-warrior-card strong {
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+.battle-warrior-name {
+  font-weight: 800;
+  letter-spacing: .025em;
+}
+.battle-warriors-vs {
+  font-family: var(--ui-serif);
+  font-weight: 600;
+  text-shadow: 0 1px 3px #000;
+}
+
+.random-rival-quick {
+  border-radius: 4px;
+  border-color: rgba(255,255,255,.18);
+  background: rgba(6,8,11,.9);
+  box-shadow: 0 2px 6px rgba(0,0,0,.45);
+}
+.random-rival-quick.active {
+  border-color: rgba(229,193,109,.52);
+  color: #ead18f;
+  box-shadow: 0 2px 6px rgba(0,0,0,.45);
+  animation: none;
+}
+.current-side-quick {
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.45);
+}
+.current-side-quick.zeus,
+.current-side-quick.thor { box-shadow: 0 2px 6px rgba(0,0,0,.45); }
+
+.difficulty-button,
+.museum-quick-button {
+  border-radius: 5px;
+  background: rgba(7,9,12,.82);
+  box-shadow: 0 3px 8px rgba(0,0,0,.4);
+  text-shadow: none;
+}
+.difficulty-button span,
+.difficulty-button strong,
+.museum-quick-button {
+  letter-spacing: .035em;
+}
+
+/* Modal family */
+.warrior-modal,
+.difficulty-modal,
+.god-mode-modal,
+.museum-menu,
+.result-panel {
+  border-radius: 7px;
+  background: #0b0d10;
+  box-shadow: 0 18px 44px rgba(0,0,0,.72);
+}
+.warrior-modal { border-color: rgba(255,255,255,.16); }
+.warrior-modal.zeus { border-color: rgba(229,193,109,.34); }
+.warrior-modal.thor { border-color: rgba(155,200,229,.34); }
+.warrior-modal-faction,
+.warrior-modal-title,
+.warrior-modal-hint,
+.warrior-modal-requirement,
+.difficulty-kicker,
+.god-mode-kicker,
+.museum-menu-kicker {
+  letter-spacing: .06em;
+  font-weight: 700;
+}
+.warrior-modal h2,
+.difficulty-modal h2,
+.god-mode-modal h2,
+.museum-menu h2 {
+  letter-spacing: .02em;
+  font-weight: 700;
+}
+.warrior-modal-arrow {
+  width: 36px;
+  height: 68px;
+  border: 0;
+  border-radius: 2px;
+  background: rgba(255,255,255,.035);
+  font-size: 32px;
+}
+.warrior-modal-equipped,
+.warrior-modal-new,
+.museum-pantheon-new,
+.museum-quick-new,
+.codex-entry-new {
+  border-radius: 3px;
+  box-shadow: none;
+  text-shadow: none;
+  animation: none;
+}
+.warrior-play-side-button,
+.warrior-side-status,
+.warrior-lore-button {
+  border-radius: 4px;
+  letter-spacing: .04em;
+  box-shadow: none;
+}
+.warrior-play-side-button.zeus { background: rgba(90,63,18,.52); }
+.warrior-play-side-button.thor { background: rgba(15,50,70,.52); }
+
+.difficulty-option,
+.museum-pantheon {
+  border-radius: 4px;
+  background: rgba(255,255,255,.025);
+}
+.difficulty-option.selected {
+  background: rgba(229,193,109,.07);
+  box-shadow: none;
+}
+.difficulty-option strong,
+.museum-pantheon strong { letter-spacing: .035em; }
+
+.new-battle,
+.view-unlocked-warrior,
+.god-mode-awaken {
+  border-radius: 3px;
+  box-shadow: 0 4px 10px rgba(0,0,0,.4);
+  letter-spacing: .055em;
+}
+
+/* Museum / Codex: editorial navigation, not a cluster of pill buttons */
+.codex-screen {
+  background: #080a0d;
+}
+.codex-page {
+  width: min(100%,620px);
+  color: #eee7d9;
+}
+.codex-nav {
+  padding: 8px 0 18px;
+  background: linear-gradient(180deg,#080a0d 72%,rgba(8,10,13,0));
+}
+.codex-nav-button,
+.codex-close,
+.codex-language button {
+  border: 0;
+  background: transparent;
+  color: rgba(255,255,255,.58);
+  box-shadow: none;
+}
+.codex-nav-button {
+  min-height: 30px;
+  padding: 4px 2px;
+  border-radius: 0;
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: .035em;
+}
+.codex-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 0;
+  font-weight: 300;
+}
+.codex-language { gap: 8px; }
+.codex-language button {
+  padding: 4px 2px;
+  border-radius: 0;
+  border-bottom: 1px solid transparent;
+  font-size: 8px;
+  font-weight: 650;
+}
+.codex-language button.active {
+  color: #ead39a;
+  border-color: #ead39a;
+}
+
+.codex-index>header,
+.codex-detail>header {
+  padding: 22px 4px 26px;
+}
+.codex-eyebrow {
+  color: rgba(255,255,255,.4);
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: .09em;
+}
+.codex-index h1,
+.codex-detail h1 {
+  margin-top: 8px;
+  font-family: var(--ui-serif);
+  font-size: clamp(32px,9vw,46px);
+  font-weight: 700;
+  letter-spacing: .015em;
+}
+.codex-subtitle,
+.codex-index header p {
+  letter-spacing: .04em;
+  font-weight: 600;
+}
+
+.codex-character-nav {
+  margin: -4px 0 20px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  padding: 7px 0;
+}
+.codex-character-nav button {
+  min-height: 28px;
+  padding: 4px 2px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: rgba(255,255,255,.6);
+  font-size: 7px;
+  font-weight: 650;
+  letter-spacing: .03em;
+}
+.codex-character-nav span {
+  color: rgba(255,255,255,.32);
+  font-weight: 600;
+  letter-spacing: .035em;
+}
+
+.codex-list { gap: 1px; }
+.codex-entry {
+  min-height: 72px;
+  border: 0;
+  border-bottom: 1px solid rgba(255,255,255,.09);
+  border-radius: 0;
+  background: transparent;
+  padding: 9px 4px;
+}
+.codex-entry:first-child { border-top: 1px solid rgba(255,255,255,.09); }
+.codex-entry.unlocked:hover { background: rgba(255,255,255,.025); }
+.codex-entry.locked { opacity: .42; }
+.codex-entry-text strong {
+  font-family: var(--ui-serif);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .01em;
+}
+.codex-entry-text small {
+  font-weight: 600;
+  letter-spacing: .035em;
+}
+.codex-entry-number { font-weight: 600; }
+.codex-entry-arrow { font-size: 20px; color: rgba(255,255,255,.26); }
+
+.codex-comparison { gap: 14px; margin-bottom: 24px; }
+.codex-image-box {
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 5px;
+  background: #0d1014;
+}
+.codex-comparison figcaption {
+  padding-top: 8px;
+  color: rgba(255,255,255,.4);
+  font-size: 7px;
+  font-weight: 600;
+  letter-spacing: .035em;
+  line-height: 1.35;
+}
+.codex-copy {
+  padding: 24px 3px;
+  border-top: 1px solid rgba(255,255,255,.11);
+}
+.codex-copy h2 {
+  margin-bottom: 12px;
+  color: #d9bd79;
+  font-family: var(--ui-sans);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .07em;
+}
+.codex-copy p {
+  color: rgba(238,231,217,.84);
+  font-family: var(--ui-serif);
+  font-size: 15px;
+  line-height: 1.72;
+}
+
+/* Global language: tiny segmented text control, no capsule */
+.global-language {
+  gap: 7px;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 0;
+  background: rgba(5,7,10,.52);
+}
+.global-language button {
+  padding: 3px 2px;
+  border-bottom: 1px solid transparent;
+  font-size: 7px;
+  font-weight: 650;
+}
+.global-language button.active {
+  color: #f0ce78;
+  border-color: #f0ce78;
+}
+
+/* Museum CTA remains discoverable, but no oversized pill */
+.museum-quick-button {
+  min-width: 58px;
+  height: 27px;
+  padding-inline: 6px;
+  border-color: rgba(225,205,160,.32);
+  font-weight: 700;
+  letter-spacing: .025em;
+}
+
+@media (max-width: 380px) {
+  .scene { border-radius: 7px; }
+  .player-selector { gap: 2px; padding: 4px; }
+  .player-choice { padding-inline: 6px; font-size: 9px; }
+  .codex-page { padding-inline: 14px; }
+  .codex-copy p { font-size: 14px; }
+}
