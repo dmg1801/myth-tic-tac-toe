@@ -2339,7 +2339,7 @@ const displayedThorWarrior =
           </div>
         )}
         <div className="game-signature">
-          ZEUS vs THOR · v5.0.0 · dmongayg - @pasoveoleo - 2026
+          ZEUS vs THOR · v6.0.0 · dmongayg - @pasoveoleo - 2026
         </div>
       </section>
     </main>
